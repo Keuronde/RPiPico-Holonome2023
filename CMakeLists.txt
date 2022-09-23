@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 pico_sdk_init()
 add_executable(test
 test.c
+gyro.c
 )
 pico_enable_stdio_usb(test 1)
 pico_enable_stdio_uart(test 1)
