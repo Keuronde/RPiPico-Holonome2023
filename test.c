@@ -22,12 +22,13 @@ int main() {
     Gyro_Init();
 
     while (1) { 
+        u_int16_t step_ms = 100;
         /*gpio_put(LED_PIN, 0);
         sleep_ms(251);
         gpio_put(LED_PIN, 1);
         puts("Bonjour");
         sleep_ms(1000);*/
-        sleep_ms(1000);
-        Gyro_Read();
+        sleep_ms(step_ms);
+        Gyro_Read(step_ms);
     }
 }
