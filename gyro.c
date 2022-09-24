@@ -2,6 +2,8 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "hardware/spi.h"
+#include "hardware/structs/spi.h"
+#include "spi_nb.h"
 
 const uint PIN_CS = 1;
 
@@ -26,6 +28,22 @@ void Gyro_Init(void){
 
     //Ça doit être les valeurs par défaut, mais ça marche !
     spi_set_format(spi0, 8, SPI_CPHA_1, SPI_CPOL_1, SPI_MSB_FIRST);
+
+    // Pour chaque SPI nous avons les registres suivants :
+
+    // SSPCR0 : Configuré par spi_init()
+    // SSPCR1 : Configuré par spi_init()
+    // SSPDR : Lecture ou écriture des données (avec FIFO)
+    // SSPSR : C'est les status qui permettent de savoir si on a des données à recevoir ou à envoyer.
+    // SSPCPSR : Configuré par spi_init() ou baudrate
+    // SSPIMSC : Activation ou désactivation des interruptions
+    // SSPRIS : Etat des drapeaux des interrutions - sans tenir compte des masquages
+    // SSPMIS : Etat des drapeaux des interrutions - en tenant compte des masquages
+    // SSPICR : Pour effacer les interruptions 
+    // SSPDMACR : DMA
+    // 
+    
+    
 
     // Test de la présence du gyroscope :
     if(gyro_init_check()){
@@ -66,20 +84,12 @@ void Gyro_Read(void){
     int nb_recu;
     // Lire l'adresse d'identification
     // WHO_AM_I : 0x0F
+    puts("Lecture 0x0F");
     cs_select();
-    puts("Envoi");
-
-    spi_write_blocking(spi0, reg, 1);
-    // Doit répondre : 0b1101 0111
-    puts(reg);
-    puts("Lecture");
-    sleep_ms(10);
-
-    nb_recu = spi_read_blocking(spi0, 0x55, tampon, 1);
-    tampon[nb_recu]='\0'; 
-    puts(tampon);
+    while(spi_nb_read_register_8bits(spi0, 0x0F, tampon, 1) == SPI_IN_PROGRESS);
     cs_deselect();
-    
+    tampon[1]='\0'; 
+    puts(tampon);
     
 
 

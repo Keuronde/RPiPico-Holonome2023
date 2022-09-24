@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
-#include "hardware/i2c.h"
 #include "pico/binary_info.h"
 
 #include "gyro.h"
@@ -18,6 +17,7 @@ int main() {
     gpio_set_dir(LED_PIN, GPIO_OUT);
     gpio_put(LED_PIN, 1);
 
+    sleep_ms(3000);
 
     Gyro_Init();
 
