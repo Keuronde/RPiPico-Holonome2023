@@ -32,6 +32,7 @@ void Gyro_Init(void){
     // Test de la présence du gyroscope :
     if(gyro_init_check()){
         puts("Gyroscope non trouve");
+        gyro_config();
     }else{
         puts("Gyroscope trouve");
         gyro_config();
@@ -59,11 +60,22 @@ void gyro_config(){
     // Xen : 1
 
     uint16_t tampon[2] = {0x20, 0b11101111};
+    uint8_t tampon2[10]="\0\0\0\0\0\0\0\0\0";
+    int statu, nb_read;
     while(spi_nb_busy(spi0) == SPI_BUSY);
     cs_select();
     int rep = spi_nb_write_data(spi0, tampon, 2);
+    if(rep == SPI_ERR_TRANSMIT_FIFO_FULL){
+        printf("Erreur: spi_read_register: SPI_ERR_TRANSMIT_FIFO_FULL\n");
+        //return statu;
+    }
     while(spi_nb_busy(spi0) == SPI_BUSY);
     cs_deselect();
+
+    nb_read = spi_nb_read_data_8bits(spi0, tampon2);
+    printf("%d caracteres lus\n", nb_read);
+    
+    printf("tampon2 : %#4x %#4x %#4x\n", tampon2[0], tampon2[1], tampon2[2]);
 
     if (rep == SPI_ERR_TRANSMIT_FIFO_FULL){
         while(1){
@@ -91,17 +103,12 @@ int gyro_read_register_blocking(uint8_t registrer, uint8_t *tampon, uint8_t nb_a
 }
 
 void Gyro_Read(uint16_t step_ms){
-    uint8_t tampon[10]="123456789";
+    uint8_t tampon[10]="\0\0\0\0\0\0\0\0\0";
+    uint8_t tampon2[10]="ABCDEFGHI";
     int16_t rot_x, rot_y, rot_z;
     static double angle_x=0, angle_y=0, angle_z=0;
     int nb_recu;
 
-
-    //cs_select();
-    //while(spi_nb_read_register_8bits(spi0, 0x20, tampon, 1) == SPI_IN_PROGRESS);
-    //cs_deselect();
-    gyro_read_register_blocking(0x20, tampon, 1);
-    //printf ("Gyro CTRL1 : %#4x\n", tampon[0] );
 
 
     spi_read_register(spi0, 0x20, tampon, 1);
@@ -113,6 +120,7 @@ void Gyro_Read(uint16_t step_ms){
 
     //gyro_read_register_blocking(0x28, tampon, 6);
     spi_read_register(spi0, 0x28, tampon, 6);
+
 
     for(int i=0; i<10; i++){
         printf("%#4x ", tampon[i]);
@@ -127,6 +135,10 @@ void Gyro_Read(uint16_t step_ms){
     angle_z = angle_z + (double)rot_z * step_ms * 0.001 * 0.00875;
     
     printf("rx : %f, ry : %f, rz: %f\n", angle_x, angle_y, angle_z);
+
+    //while(spi_nb_busy(spi0));
+    //spi_nb_read_data_8bits(spi0,tampon);
+    //printf("tampon : %s\n", tampon);
 
 
 }

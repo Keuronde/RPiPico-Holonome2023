@@ -146,7 +146,7 @@ void spi_nb_flush_recieve_fifo(spi_inst_t * spi){
 uint8_t spi_nb_read_data_8bits(spi_inst_t * spi, uint8_t * buffer){
     uint8_t index = 0;
     while(spi_get_hw(spi)->sr & SPI_SSPSR_RNE_BITS){
-        buffer[index] = (uint8_t)spi_get_hw(spi)->dr & SPI_SSPDR_DATA_BITS;
+        buffer[index] = (uint8_t)spi_get_hw(spi)->dr ;//& SPI_SSPDR_DATA_BITS;
         index++;
     }
     return index;
