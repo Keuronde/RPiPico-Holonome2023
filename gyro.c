@@ -4,12 +4,25 @@
 #include "hardware/spi.h"
 #include "hardware/structs/spi.h"
 #include "spi_nb.h"
+#include "Temps.h"
 
 const uint PIN_CS = 1;
+
+/// @brief structure d'échange des angles du gyrocope
+struct t_angle_gyro{
+    int32_t rot_x, rot_y, rot_z;
+} angle_gyro, angle_gyro_moy;
 
 int gyro_init_check();
 void gyro_config();
 int gyro_read_register_blocking(uint8_t registrer, uint8_t *tampon, uint8_t nb_a_lire);
+void gyro_get_angles(struct t_angle_gyro* angle_gyro);
+void gyro_calibration(void);
+
+uint32_t rot_x_zero, rot_y_zero, rot_z_zero;
+
+
+
 
 
 void Gyro_Init(void){
@@ -32,11 +45,11 @@ void Gyro_Init(void){
     // Test de la présence du gyroscope :
     if(gyro_init_check()){
         puts("Gyroscope non trouve");
-        gyro_config();
     }else{
         puts("Gyroscope trouve");
         gyro_config();
     }
+    //gyro_calibration();
 }
 
 int gyro_init_check(){
@@ -110,35 +123,64 @@ void Gyro_Read(uint16_t step_ms){
     int nb_recu;
 
 
-
     spi_read_register(spi0, 0x20, tampon, 1);
     //printf ("Gyro CTRL1 (bis) : %#4x\n", tampon[1] );
 
     //printf ("RPI SSPCPSR : %#4x\n", spi_get_hw(spi0)->cpsr );
     //printf ("RPI SSPCR0 : %#4x\n", spi_get_hw(spi0)->cr0 );
 
+    gyro_get_angles(&angle_gyro);
 
-    //gyro_read_register_blocking(0x28, tampon, 6);
-    spi_read_register(spi0, 0x28, tampon, 6);
-
-
-    for(int i=0; i<10; i++){
-        printf("%#4x ", tampon[i]);
-    }
-
-    rot_x = -(tampon[1] + (tampon[2] << 8));
-    rot_y = -(tampon[3] + (tampon[4] << 8));
-    rot_z = -(tampon[5] + (tampon[6] << 8));
-
-    angle_x = angle_x + (double)rot_x * step_ms * 0.001 * 0.00875;
-    angle_y = angle_y + (double)rot_y * step_ms * 0.001 * 0.00875;
-    angle_z = angle_z + (double)rot_z * step_ms * 0.001 * 0.00875;
+    angle_x = angle_x + (double)angle_gyro.rot_x * step_ms * 0.001 * 0.00875 * 0.125;
+    angle_y = angle_y + (double)angle_gyro.rot_y * step_ms * 0.001 * 0.00875 * 0.125;
+    angle_z = angle_z + (double)angle_gyro.rot_z * step_ms * 0.001 * 0.00875 * 0.125;
     
     printf("rx : %f, ry : %f, rz: %f\n", angle_x, angle_y, angle_z);
 
     //while(spi_nb_busy(spi0));
     //spi_nb_read_data_8bits(spi0,tampon);
     //printf("tampon : %s\n", tampon);
+}
 
+void gyro_get_angles(struct t_angle_gyro* angle_gyro){
+    uint8_t tampon[10]="\0\0\0\0\0\0\0\0\0";
+    int16_t rot_x, rot_y, rot_z;
+    spi_read_register(spi0, 0x28, tampon, 6);
+    
+    rot_x = -(tampon[1] + (tampon[2] << 8));
+    rot_y = -(tampon[3] + (tampon[4] << 8));
+    rot_z = -(tampon[5] + (tampon[6] << 8));
+
+    angle_gyro->rot_x = (int32_t) rot_x * 8;
+    angle_gyro->rot_y = (int32_t) rot_y * 8;
+    angle_gyro->rot_z = (int32_t) rot_z * 8;
+
+    
+
+}
+
+void gyro_calibration(void){
+    uint16_t nb_ech = 3000;
+    uint32_t m_temps_ms = Temps_get_temps_ms();
+
+    printf("Calibration...\n");
+
+    angle_gyro_moy.rot_x = 0;
+    angle_gyro_moy.rot_y = 0;
+    angle_gyro_moy.rot_z = 0;
+    
+    for(uint16_t i=0; i<nb_ech; i++){
+        while(m_temps_ms == Temps_get_temps_ms());
+        gyro_get_angles(&angle_gyro);
+        angle_gyro_moy.rot_x += angle_gyro.rot_x;
+        angle_gyro_moy.rot_y += angle_gyro.rot_y;
+        angle_gyro_moy.rot_z += angle_gyro.rot_z;
+    }
+    angle_gyro_moy.rot_x = angle_gyro_moy.rot_x / nb_ech;
+    angle_gyro_moy.rot_y = angle_gyro_moy.rot_y / nb_ech;
+    angle_gyro_moy.rot_z = angle_gyro_moy.rot_z / nb_ech;
+
+    printf("Calibration : rx : %f, ry : %f, rz: %f\n", angle_gyro_moy.rot_x, 
+    angle_gyro_moy.rot_y, angle_gyro_moy.rot_z);
 
 }

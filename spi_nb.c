@@ -158,23 +158,23 @@ uint8_t spi_nb_read_data_8bits(spi_inst_t * spi, uint8_t * buffer){
 /// @param size size of the data to transmit
 /// @return SPI_OK or SPI_ERR_TRANSMIT_FIFO_FULL
 inline int spi_nb_write_data(spi_inst_t * spi, uint16_t * buffer, uint8_t size){
-    int statu_spi = SPI_OK;
+    int status_spi = SPI_OK;
     uint8_t index=0;
     do
     {
         if(spi_get_hw(spi)->sr & SPI_SSPSR_TNF_BITS){
             spi_get_hw(spi)->dr = buffer[index];
-            statu_spi = SPI_OK;
+            status_spi = SPI_OK;
         }else{
-            statu_spi = SPI_ERR_TRANSMIT_FIFO_FULL;
+            status_spi = SPI_ERR_TRANSMIT_FIFO_FULL;
         }
-        while (spi_is_busy(spi));
+        while (spi_nb_busy(spi));
         //statu_spi = spi_nb_write_byte(spi, buffer[index]);
         //printf("envoi : %x\n", buffer[index]);
         //sleep_ms(1);
         index++;
-    } while ( (statu_spi == SPI_OK) && (index < size));
-    return statu_spi;
+    } while ( (status_spi == SPI_OK) && (index < size));
+    return status_spi;
 }
 
 /// @brief Write one "byte", 4 to 16 bits to the SPI Transmit FIFO.

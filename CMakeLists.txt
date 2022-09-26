@@ -8,6 +8,7 @@ add_executable(test
 test.c
 spi_nb.c
 gyro.c
+Temps.c
 )
 pico_enable_stdio_usb(test 1)
 pico_enable_stdio_uart(test 1)
