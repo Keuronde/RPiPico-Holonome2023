@@ -27,25 +27,16 @@ int main() {
     Gyro_Init();
     temps_ms = Temps_get_temps_ms();
     while (1) { 
-        u_int16_t step_ms = 100;
+        u_int16_t step_ms = 5;
         
         // Tous les pas de step_ms
         if(temps_ms == Temps_get_temps_ms()){
             temps_ms += step_ms;
-
-
-            
-            
-            /*gpio_put(LED_PIN, 0);
-            sleep_ms(251);
-            gpio_put(LED_PIN, 1);
-            puts("Bonjour");
-            sleep_ms(1000);*/
-            //sleep_ms(step_ms);
             Gyro_Read(step_ms);
             
-            
         }
+
+        // Toutes les 500 ms
         if((Temps_get_temps_ms() % 500) == 0){
             gyro_affiche(gyro_get_angle(), "Angle :");
         }

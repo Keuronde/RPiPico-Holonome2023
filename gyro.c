@@ -45,8 +45,9 @@ void Gyro_Init(void){
     gpio_set_dir(PIN_CS, GPIO_OUT);
     cs_deselect();
 
-    spi_init(spi0, 100 * 1000); // SPI init @ 100 kHz
-    //spi_init(spi0, 2 * 1000 * 1000); // SPI init @ 2 MHz
+    //spi_init(spi0, 100 * 1000); // SPI init @ 100 kHz
+    uint speed = spi_init(spi0, 2 * 1000 * 1000); // SPI init @ 2 MHz
+    printf("vitesse SPI : %d ", speed);
 
     //Ça doit être les valeurs par défaut, mais ça marche !
     spi_set_format(spi0, 8, SPI_CPHA_1, SPI_CPOL_1, SPI_MSB_FIRST);
@@ -81,7 +82,8 @@ void gyro_config(){
     // Yen : 1
     // Xen : 1
 
-    uint16_t tampon[2] = {0x20, 0b11101111};
+    uint8_t config = 0b11101111;
+    uint16_t tampon[2] = {0x20, config};
     uint8_t tampon2[10]="\0\0\0\0\0\0\0\0\0";
     int statu, nb_read;
     while(spi_nb_busy(spi0) == SPI_BUSY);
@@ -94,19 +96,13 @@ void gyro_config(){
     while(spi_nb_busy(spi0) == SPI_BUSY);
     cs_deselect();
 
-    nb_read = spi_nb_read_data_8bits(spi0, tampon2);
-    printf("%d caracteres lus\n", nb_read);
+    spi_read_register(spi0, 0x20, tampon2, 1);
     
-    printf("tampon2 : %#4x %#4x %#4x\n", tampon2[0], tampon2[1], tampon2[2]);
-
-    if (rep == SPI_ERR_TRANSMIT_FIFO_FULL){
-        while(1){
-            printf("gyro_config: SPI_ERR_TRANSMIT_FIFO_FULL\n");
-        }
-    }else{
+    if(tampon2[1] == config){
         puts("gyro_config ok !");
+    }else{
+        puts("gyro_config FAILED !");
     }
-
     // Registre 
 
 
@@ -132,19 +128,21 @@ void Gyro_Read(uint16_t step_ms){
     int nb_recu;
 
 
-    spi_read_register(spi0, 0x20, tampon, 1);
+    //spi_read_register(spi0, 0x20, tampon, 1);
     //printf ("Gyro CTRL1 (bis) : %#4x\n", tampon[1] );
 
     //printf ("RPI SSPCPSR : %#4x\n", spi_get_hw(spi0)->cpsr );
     //printf ("RPI SSPCR0 : %#4x\n", spi_get_hw(spi0)->cr0 );
 
-    //gyro_get_angles(&angle_gyro, &angle_gyro_calibration);
-    gyro_get_angles(&vitesse_angulaire, NULL);
+    gyro_get_angles(&vitesse_angulaire, &vitesse_calibration);
+    //gyro_get_angles(&vitesse_angulaire, NULL);
 
     // Angle en degré
     angle_gyro.rot_x = angle_gyro.rot_x + (double)vitesse_angulaire.rot_x * step_ms * 0.001 * 0.00875 * 0.125;
     angle_gyro.rot_y = angle_gyro.rot_y + (double)vitesse_angulaire.rot_y * step_ms * 0.001 * 0.00875 * 0.125;
     angle_gyro.rot_z = angle_gyro.rot_z + (double)vitesse_angulaire.rot_z * step_ms * 0.001 * 0.00875 * 0.125;
+
+    //printf("%d, %#4x, %#4x, %#4x\n", step_ms, vitesse_angulaire.rot_x, vitesse_angulaire.rot_y, vitesse_angulaire.rot_z);
     
     //printf("rx : %f, ry : %f, rz: %f\n", angle_gyro.rot_x, angle_gyro.rot_y, angle_gyro.rot_z);
 
@@ -187,7 +185,7 @@ void gyro_affiche(struct t_angle_gyro_double angle_gyro, char * titre){
 }
 
 void gyro_calibration(void){
-    uint32_t nb_ech = 3000;
+    uint32_t nb_ech = 100;
     uint32_t m_temps_ms = Temps_get_temps_ms();
 
     printf("Calibration...\n");
