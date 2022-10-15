@@ -14,7 +14,7 @@ uint16_t spi0_slave_register;
 uint8_t* spi0_buffer;
 uint8_t  spi0_nb_data_to_read;
 
-#define PIN_CS 1
+
 
 void cs_select(void) {
     asm volatile("nop \n nop \n nop");
@@ -158,7 +158,7 @@ uint8_t spi_nb_read_data_8bits(spi_inst_t * spi, uint8_t * buffer){
 /// @param size size of the data to transmit
 /// @return SPI_OK or SPI_ERR_TRANSMIT_FIFO_FULL
 inline int spi_nb_write_data(spi_inst_t * spi, uint16_t * buffer, uint8_t size){
-    int status_spi = SPI_OK;
+    int status_spi;
     uint8_t index=0;
     do
     {
@@ -168,7 +168,7 @@ inline int spi_nb_write_data(spi_inst_t * spi, uint16_t * buffer, uint8_t size){
         }else{
             status_spi = SPI_ERR_TRANSMIT_FIFO_FULL;
         }
-        while (spi_nb_busy(spi));
+        //while (spi_nb_busy(spi));// <== ça, c'est bizarre !
         //statu_spi = spi_nb_write_byte(spi, buffer[index]);
         //printf("envoi : %x\n", buffer[index]);
         //sleep_ms(1);
@@ -209,5 +209,65 @@ int spi_read_register(spi_inst_t * spi, uint16_t spi_slave_register, uint8_t *bu
     if(nb_read != nb_to_read+1){
         printf("Erreur: spi_read_register, nb de valeurs lues incoherentes");
     }
+    return nb_read;
 
+}
+
+void spi_test(){
+    // Gyro_Init
+
+    uint16_t tampon_ecriture[] = {'a','b','c','d','e','f','g','h','i','j',0};
+    uint8_t tampon_lecture[10] = {0,0,0,0,0,0,0,0,0,0};
+    uint8_t nb_lu, statu;
+
+    uint8_t config = 0b11101111;
+    uint16_t config_gyro[2] = {0x20, config};
+
+
+    gpio_set_function(16, GPIO_FUNC_SPI); // SDI
+    gpio_set_function(18, GPIO_FUNC_SPI); // SCK
+    gpio_set_function(19, GPIO_FUNC_SPI); // SDO
+    gpio_set_function(PIN_CS, GPIO_OUT); // CSn
+
+    gpio_init(PIN_CS);
+    gpio_set_dir(PIN_CS, GPIO_OUT);
+    cs_deselect();
+
+    //spi_init(spi0, 100 * 1000); // SPI init @ 100 kHz
+    uint speed = spi_init(spi0, 2 * 1000 * 1000); // SPI init @ 2 MHz
+    printf("vitesse SPI : %d\n", speed);
+
+    //Ça doit être les valeurs par défaut, mais ça marche !
+    spi_set_format(spi0, 8, SPI_CPHA_1, SPI_CPOL_1, SPI_MSB_FIRST);
+
+    // Gyro_Init
+
+    // gyro_config
+
+
+    cs_select();
+    statu = spi_nb_write_data(spi0, config_gyro, 2);
+    if(statu == SPI_ERR_TRANSMIT_FIFO_FULL){
+        printf("Erreur: spi_read_register: SPI_ERR_TRANSMIT_FIFO_FULL\n");
+    }
+
+    while(spi_nb_busy(spi0));
+    cs_deselect();
+
+    nb_lu = spi_read_register(spi0, 0x20, tampon_lecture, 1);
+
+
+    printf("Nb lu: %d\n", nb_lu);
+    //puts(tampon_lecture);
+
+    if(tampon_lecture[1] == config){
+        puts("gyro_config ok !");
+    }else{
+        puts("gyro_config FAILED !");
+        printf("gyro_config FAILED ! :%#4x\n", tampon_lecture[1]);
+    }
+    
+
+
+    
 }

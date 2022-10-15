@@ -9,11 +9,12 @@ test.c
 spi_nb.c
 gyro.c
 Temps.c
+Servomoteur.c
 )
 pico_enable_stdio_usb(test 1)
 pico_enable_stdio_uart(test 1)
 pico_add_extra_outputs(test)
-target_link_libraries(test pico_stdlib hardware_spi hardware_structs)
+target_link_libraries(test pico_stdlib hardware_spi hardware_pwm hardware_structs)
 
 add_custom_target(Flash
     DEPENDS test

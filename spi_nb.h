@@ -7,8 +7,10 @@
 #define SPI_IN_PROGRESS 1
 #define SPI_FAILED 2
 
-#define SPI_ERR_TRANSMIT_FIFO_FULL 1
+#define SPI_ERR_TRANSMIT_FIFO_FULL -1
 #define SPI_OK 0
+
+#define PIN_CS 1
 
 int spi_nb_busy(spi_inst_t * spi);
 void spi_nb_flush_recieve_fifo(spi_inst_t * spi);
@@ -20,3 +22,4 @@ int spi_read_register(spi_inst_t * spi, uint16_t spi_slave_register, uint8_t *bu
 
 void cs_select(void);
 void cs_deselect(void);
+void spi_test();
