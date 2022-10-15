@@ -1,0 +1,96 @@
+{
+    "env": {
+        "myDefaultIncludePath": [
+            "${workspaceFolder}",
+            "${env:PICO_SDK_PATH}/src/./common/pico_binary_info/include",
+            "${env:PICO_SDK_PATH}/src/./common/pico_base/include",
+            "${env:PICO_SDK_PATH}/src/./common/pico_time/include",
+            "${env:PICO_SDK_PATH}/src/./common/pico_util/include",
+            "${env:PICO_SDK_PATH}/src/./common/pico_divider/include",
+            "${env:PICO_SDK_PATH}/src/./common/boot_uf2/include",
+            "${env:PICO_SDK_PATH}/src/./common/pico_usb_reset_interface/include",
+            "${env:PICO_SDK_PATH}/src/./common/boot_picoboot/include",
+            "${env:PICO_SDK_PATH}/src/./common/pico_bit_ops/include",
+            "${env:PICO_SDK_PATH}/src/./common/pico_sync/include",
+            "${env:PICO_SDK_PATH}/src/./boards/include",
+            "${env:PICO_SDK_PATH}/src/./rp2040/hardware_structs/include",
+            "${env:PICO_SDK_PATH}/src/./rp2040/hardware_regs/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_fix/rp2040_usb_device_enumeration/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_interp/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_stdio_semihosting/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_int64_ops/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_stdio/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_gpio/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_claim/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_irq/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_resets/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_xosc/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_multicore/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_adc/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_uart/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_lwip/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_printf/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_stdio_usb/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/cmsis/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/cmsis/stub/CMSIS/Device/RaspberryPi/RP2040/Include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/cmsis/stub/CMSIS/Core/Include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_pio/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_base/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_i2c/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_rtc/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_bootrom/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_platform/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_mem_ops/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_divider/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_timer/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_unique_id/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_dma/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/boot_stage2/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_vreg/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_cyw43_arch/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_malloc/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_double/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_clocks/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_runtime/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_watchdog/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_pll/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_spi/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_float/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/pico_stdio_uart/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_sync/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_exception/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_pwm/include",
+            "${env:PICO_SDK_PATH}/src/./rp2_common/hardware_flash/include",
+            "${env:PICO_SDK_PATH}/src/common/pico_base/include",
+            "${env:PICO_SDK_PATH}/build/generated/pico_base",
+            "${env:PICO_SDK_PATH}/src/common/pico_base/include/pico",
+            "${env:PICO_SDK_PATH}/src/common/pico_stdlib/include"
+        ],
+        "myCompilerPath": "/usr/bin/arm-none-eabi-gcc"
+    },
+    "configurations": [
+        {
+            "name": "Linux",
+            "intelliSenseMode": "linux-gcc-arm",
+            "includePath": [
+                "${myDefaultIncludePath}"
+            ],
+            "defines": [
+                "FOO",
+                "BAR=100"
+            ],
+            "compilerPath": "/usr/bin/arm-none-eabi-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "configurationProvider": "ms-vscode.cmake-tools"
+        }
+    ],
+    "version": 4
+}
