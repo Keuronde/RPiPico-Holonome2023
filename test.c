@@ -38,7 +38,7 @@ int main() {
     temps_ms_old = temps_ms;
     while (1) { 
         u_int16_t step_ms = 5;
-        float coef_filtre = 0.001;
+        float coef_filtre = 0.977;
         
         while(temps_ms_old == Temps_get_temps_ms());
         temps_ms_old = Temps_get_temps_ms();

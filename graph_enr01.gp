@@ -1,4 +1,4 @@
-set title "Observation des 3 axes\nT_{acq} : 5 ms"
+set title "Observation des 3 axes\nT_{acq} : 5 ms - filtre 15 secondes"
 
 set xlabel "Temps (s)"
 set ylabel "Vitesse (°/s)"

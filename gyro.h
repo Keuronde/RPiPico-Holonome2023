@@ -1,6 +1,4 @@
-struct t_angle_gyro_double{
-    double rot_x, rot_y, rot_z;
-};
+#include "gyro_data.h"
 
 void Gyro_Init(void);
 void Gyro_Read(u_int16_t);

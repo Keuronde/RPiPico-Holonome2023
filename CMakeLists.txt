@@ -10,6 +10,7 @@ spi_nb.c
 gyro.c
 Temps.c
 Servomoteur.c
+gyro_L3GD20H.c
 )
 pico_enable_stdio_usb(test 1)
 pico_enable_stdio_uart(test 1)
