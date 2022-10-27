@@ -7,7 +7,7 @@
 #include "Temps.h"
 #include "gyro.h"
 
-#define GYRO_L3GD20H
+
 
 #ifdef GYRO_L3GD20H
     #include "gyro_L3GD20H.h"
@@ -62,11 +62,12 @@ void Gyro_Init(void){
     printf("vitesse SPI : %d\n", speed);
 
 
-    spi_set_format(spi0, 8, SPI_CPHA_1, SPI_CPOL_1, SPI_MSB_FIRST);
+    spi_set_format(spi0, 8, SPI_CPHA_0, SPI_CPOL_0, SPI_MSB_FIRST);
 
     // Test de la présence du gyroscope :
     if(gyro_init_check()){
         puts("Gyroscope non trouve");
+        while(1); // On s'arrête là !
     }else{
         puts("Gyroscope trouve");
         if(!gyro_config()){

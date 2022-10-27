@@ -11,7 +11,10 @@ gyro.c
 Temps.c
 Servomoteur.c
 gyro_L3GD20H.c
+gyro_ADXRS453.c
 )
+
+add_definitions(-DGYRO_ADXRS453)
 pico_enable_stdio_usb(test 1)
 pico_enable_stdio_uart(test 1)
 pico_add_extra_outputs(test)

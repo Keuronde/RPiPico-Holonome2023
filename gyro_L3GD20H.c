@@ -2,6 +2,8 @@
 #include "spi_nb.h"
 #include <stdio.h>
 
+#ifdef GYRO_L3GD20H
+
 int gyro_read_register_blocking(uint8_t registrer, uint8_t *tampon, uint8_t nb_a_lire){
     uint8_t reg = registrer | 0xC0 ;
     int nb_recu;
@@ -94,3 +96,5 @@ void gyro_get_vitesse_normalisee(struct t_angle_gyro* _vitesse_angulaire,
     _vitesse_gyro->rot_y = (double)_vitesse_angulaire->rot_y * 0.00875 / 32.0;
     _vitesse_gyro->rot_z = (double)_vitesse_angulaire->rot_z * 0.00875 / 32.0;
 }
+
+#endif
