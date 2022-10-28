@@ -93,7 +93,7 @@ void Gyro_Read(uint16_t step_ms){
     gyro_get_vitesse_brute(_vitesse_angulaire_brute, vitesse_calibration);
     //gyro_get_angles(&vitesse_angulaire, NULL);
 
-    /*
+    
     // conversion de la vitesse angulaire en degré/seconde
     gyro_get_vitesse_normalisee(_vitesse_angulaire_brute, vitesse_angulaire);
 
@@ -103,7 +103,7 @@ void Gyro_Read(uint16_t step_ms){
     angle_gyro.rot_x = angle_gyro.rot_x + vitesse_angulaire->rot_x * step_ms * 0.001;
     angle_gyro.rot_y = angle_gyro.rot_y + vitesse_angulaire->rot_y * step_ms * 0.001;
     angle_gyro.rot_z = angle_gyro.rot_z + vitesse_angulaire->rot_z * step_ms * 0.001;
-    */
+    
 }
 
 int16_t gyro_get_temp(void){
