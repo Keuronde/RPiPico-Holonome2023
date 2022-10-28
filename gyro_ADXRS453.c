@@ -40,28 +40,6 @@ int gyro_spi_wr_32bits(uint8_t *transmit_buffer, uint8_t *recieve_buffer){
     cs_deselect();
 }
 
-int gyro_read_register_blocking(uint8_t registrer, uint8_t *tampon, uint8_t nb_a_lire){
-    uint8_t tampon_envoi[4]="\0\0\0\0";
-    int nb_recu;
-    tampon_envoi[0] = registrer;
-
-    // Envoie commande N
-    cs_select();
-    spi_write_blocking(spi0, tampon_envoi, 4);
-    nb_recu = spi_read_blocking(spi0, 0, tampon, nb_a_lire);
-    cs_deselect();
-
-    // A faire passer à 0,1 µs
-    sleep_us(1);
-
-    // lire reponse N
-    cs_select();
-    spi_write_blocking(spi0, tampon_envoi, 4);
-    nb_recu = spi_read_blocking(spi0, 0, tampon, nb_a_lire);
-    cs_deselect();
-    
-}
-
 void affiche_tampon_32bits(uint8_t *tampon){
     uint32_t valeur;
     valeur = (tampon[0] << 24) + (tampon[1] << 16) + (tampon[2]<<8) + tampon[3];
@@ -70,10 +48,7 @@ void affiche_tampon_32bits(uint8_t *tampon){
 }
 
 
-int gyro_get_sensor_data(){
-    uint8_t tampon_envoi[5]="\0\0\0\0\0";
-    uint8_t tampon_reception[5]="\0\0\0\0\0";
-
+int gyro_get_sensor_data(uint8_t tampon_envoi[], uint8_t tampon_reception[]){
     tampon_envoi[0] = 0x30;
     tampon_envoi[1] = 0x00;
     tampon_envoi[2] = 0x00;
@@ -81,12 +56,12 @@ int gyro_get_sensor_data(){
     gyro_spi_wr_32bits(tampon_envoi, tampon_reception);
     Gyro_traitementDonnees(tampon_reception);
     if(Gyro_SensorData.SQ != 0x4){
-        printf("Gyro_Data - SQ bits (%#01x)!= 0x4\n", Gyro_SensorData.SQ);
+        printf("Gyro Failed - SQ bits (%#3x)!= 0x4\n", Gyro_SensorData.SQ);
         affiche_tampon_32bits(tampon_reception);
         return 1;
     }
     if(Gyro_SensorData.ST != 0x1){
-        printf("Gyro_Data - Status (%#01x)!= 0x1\n", Gyro_SensorData.ST);
+        printf("Gyro Failed - Status (%#3x)!= 0x1\n", Gyro_SensorData.ST);
         affiche_tampon_32bits(tampon_reception);
         return 1;
     }
@@ -171,25 +146,41 @@ int gyro_init_check(){
 
     sleep_us(1); // t=200ms + 2TD
     printf("T=200ms+2TD\n");
-    tampon_envoi[0] = 0x30;
+    tampon_envoi[0] = 0x00;
     tampon_envoi[1] = 0x00;
     tampon_envoi[2] = 0x00;
-    tampon_envoi[3] = 0x01;
-    gyro_spi_wr_32bits(tampon_envoi, tampon_reception);
-    Gyro_traitementDonnees(tampon_reception);
-    if(Gyro_SensorData.SQ != 0x4){
-        printf("Gyro_Init - SQ bits (%#01x)!= 0x4\n", Gyro_SensorData.SQ);
-        affiche_tampon_32bits(tampon_reception);
+    tampon_envoi[3] = 0x00;
+    if(gyro_get_sensor_data(tampon_envoi, tampon_reception)){
         return 1;
     }
-    if(Gyro_SensorData.ST != 0x1){
-        printf("Gyro_Init - Status (%#01x)!= 0x1\n", Gyro_SensorData.ST);
-        affiche_tampon_32bits(tampon_reception);
-        return 1;
+    
+
+    for(int i=3; i<10; i++){
+        sleep_us(1); // t=200ms + 3TD
+        printf("T=200ms+%dTD\n", i);
+        if(gyro_get_sensor_data(tampon_envoi, tampon_reception)){
+            return 1;
+        }
     }
-    affiche_tampon_32bits(tampon_reception);
+
+    for(int i=10; i<20; i++){
+        gyro_get_vitesse_brute(NULL, NULL);
+    }
+
+
+    for(int i=20; i<30; i++){
+        sleep_us(1); // t=200ms + 3TD
+        printf("T=200ms+%dTD\n", i);
+        if(gyro_get_sensor_data(tampon_envoi, tampon_reception)){
+            //return 1;
+        }
+    }
+    //DEBUG 
+    return 1;
+
 
     return 0;
+
 }
 
 
@@ -200,16 +191,16 @@ int gyro_config(){
 
 
 void gyro_get_vitesse_brute(struct t_angle_gyro* angle_gyro, struct t_angle_gyro* angle_gyro_moy){
-    uint8_t tampon[10]="\0\0\0\0\0\0\0\0\0";
-    int16_t rot_x, rot_y, rot_z;
+    uint8_t tampon_envoi[5]="\0\0\0\0\0";
+    uint8_t tampon_reception[5]="\0\0\0\0\0";
+    int16_t rot_z;
     
-
-    if(gyro_get_sensor_data()){
-        printf("GYRO : Erreur d'acquisition !\n");
+    sleep_us(1); // A supprimer plus tard
+    printf("T=READ\n");
+    if(gyro_get_sensor_data(tampon_envoi, tampon_reception)){
+        return;
     }
-    
-    rot_x = 0;
-    rot_y = 0;
+    /*
     rot_z = Gyro_SensorData.rateData;
 
     if(angle_gyro_moy == NULL){
@@ -220,7 +211,7 @@ void gyro_get_vitesse_brute(struct t_angle_gyro* angle_gyro, struct t_angle_gyro
         angle_gyro->rot_x = 0;
         angle_gyro->rot_y = 0;
         angle_gyro->rot_z = (int32_t) rot_z * 32 - angle_gyro_moy->rot_z;
-    }
+    }*/
 }
 
 void gyro_get_vitesse_normalisee(struct t_angle_gyro* _vitesse_angulaire,

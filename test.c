@@ -46,6 +46,7 @@ int main() {
         // Tous les pas de step_ms
         if(Temps_get_temps_ms() % step_ms){
             Gyro_Read(step_ms);
+            /*
             //gyro_affiche(gyro_get_vitesse(), "Angle :");
             // Filtre 
             angle_gyro = gyro_get_vitesse();
@@ -61,6 +62,7 @@ int main() {
 
             printf("%f, %f, %f, %f\n", (double)temps_ms_old / 1000, vitesse_filtre_x, vitesse_filtre_y, vitesse_filtre_z);
             //gyro_affiche(angle_gyro, "Vitesse (°/s),");
+            */
         }
 
         // Toutes les 50 ms

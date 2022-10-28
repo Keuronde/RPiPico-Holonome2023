@@ -73,7 +73,7 @@ void Gyro_Init(void){
         if(!gyro_config()){
             puts("gyro_config ok !");
         }else{
-            printf("gyro_config FAILED !");
+            puts("gyro_config FAILED !");
 
         }
     }
@@ -84,13 +84,8 @@ void Gyro_Init(void){
 }
 
 void Gyro_Read(uint16_t step_ms){
-    uint8_t tampon[10]="\0\0\0\0\0\0\0\0\0";
-    uint8_t tampon2[10]="ABCDEFGHI";
-    int16_t rot_x, rot_y, rot_z;
-    static double angle_x=0, angle_y=0, angle_z=0;
     struct t_angle_gyro * _vitesse_angulaire_brute;
     struct t_angle_gyro  m_vitesse_angulaire_brute;
-    int nb_recu;
 
     _vitesse_angulaire_brute = &m_vitesse_angulaire_brute;
 
@@ -98,7 +93,7 @@ void Gyro_Read(uint16_t step_ms){
     gyro_get_vitesse_brute(_vitesse_angulaire_brute, vitesse_calibration);
     //gyro_get_angles(&vitesse_angulaire, NULL);
 
-
+    /*
     // conversion de la vitesse angulaire en degré/seconde
     gyro_get_vitesse_normalisee(_vitesse_angulaire_brute, vitesse_angulaire);
 
@@ -108,6 +103,7 @@ void Gyro_Read(uint16_t step_ms){
     angle_gyro.rot_x = angle_gyro.rot_x + vitesse_angulaire->rot_x * step_ms * 0.001;
     angle_gyro.rot_y = angle_gyro.rot_y + vitesse_angulaire->rot_y * step_ms * 0.001;
     angle_gyro.rot_z = angle_gyro.rot_z + vitesse_angulaire->rot_z * step_ms * 0.001;
+    */
 }
 
 int16_t gyro_get_temp(void){
