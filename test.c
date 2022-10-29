@@ -46,7 +46,11 @@ int main() {
         
         // Tous les pas de step_ms
         if(!(temps_ms % step_ms)){
+            uint64_t _time;
+            uint32_t time_after_read, time_after_filter, time_after_printf;
+            _time = time_us_64();
             Gyro_Read(step_ms);
+            time_after_read = time_us_64() - _time;
             
             //gyro_affiche(gyro_get_vitesse(), "Angle :");
             // Filtre 
@@ -60,15 +64,21 @@ int main() {
                 vitesse_filtre_y = vitesse_filtre_y * (1-coef_filtre) + angle_gyro.rot_y * coef_filtre;
                 vitesse_filtre_z = vitesse_filtre_z * (1-coef_filtre) + angle_gyro.rot_z * coef_filtre;
             }
+            time_after_filter = time_us_64() - _time;
 
-            printf("%f, %f\n", (double)temps_ms_old / 1000,  vitesse_filtre_z);
+            //printf("%#x, %#x\n", (double)temps_ms_old / 1000,  vitesse_filtre_z);
+
+            //printf("%d, %d\n", temps_ms, (int32_t) (vitesse_filtre_z * 1000));
+            time_after_printf = time_us_64() - _time;
             //gyro_affiche(angle_gyro, "Vitesse (°/s),");
             
         }
 
         // Toutes les 50 ms
         if((Temps_get_temps_ms() % 50) == 0){
-            
+            struct t_angle_gyro_double m_gyro;
+            m_gyro = gyro_get_angle();
+            printf("%f, %f\n", (double)temps_ms / 1000,  m_gyro.rot_z);
         }
 
         // Toutes les 500 ms

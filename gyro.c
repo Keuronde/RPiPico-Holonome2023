@@ -78,9 +78,9 @@ void Gyro_Init(void){
         }
     }
     sleep_ms(150); // Temps d'init du gyroscope
-    /*while(1){
-        gyro_calibration();
-    }*/
+    
+    gyro_calibration();
+    
 }
 
 void Gyro_Read(uint16_t step_ms){
@@ -123,8 +123,8 @@ void gyro_affiche(struct t_angle_gyro_double angle_gyro, char * titre){
 }
 
 void gyro_calibration(void){
-    uint32_t t_calibration_ms = 40000;
-    uint32_t nb_ech = t_calibration_ms/5;
+    uint32_t t_calibration_ms = 10000;
+    uint32_t nb_ech = t_calibration_ms/2;
     uint32_t m_temps_ms = Temps_get_temps_ms();
     uint32_t temps_500ms = m_temps_ms;
     int16_t temperature;
@@ -145,19 +145,20 @@ void gyro_calibration(void){
         vitesse_calibration->rot_x += vitesse_grute_gyro.rot_x;
         vitesse_calibration->rot_y += vitesse_grute_gyro.rot_y;
         vitesse_calibration->rot_z += vitesse_grute_gyro.rot_z;
-        if(m_temps_ms > temps_500ms){
+        /*if(m_temps_ms > temps_500ms){
             printf(".");
             gyro_get_temp();
             temps_500ms += 500;
-        }
-        sleep_ms(5);
+        }*/
+        sleep_ms(2);
     }
     vitesse_calibration->rot_x = vitesse_calibration->rot_x / (int32_t)nb_ech;
     vitesse_calibration->rot_y = vitesse_calibration->rot_y / (int32_t)nb_ech;
     vitesse_calibration->rot_z = vitesse_calibration->rot_z / (int32_t)nb_ech;
-    temperature = gyro_get_temp();
+    //temperature = gyro_get_temp();
 
-    printf("fin calibration, %d, %d, %d, %d\n", vitesse_calibration->rot_x, vitesse_calibration->rot_y ,vitesse_calibration->rot_z, temperature);
+    //printf("fin calibration, %d, %d, %d, %d\n", vitesse_calibration->rot_x, vitesse_calibration->rot_y ,vitesse_calibration->rot_z, temperature);
+    printf("fin calibration, %d\n", vitesse_calibration->rot_z);
 
 }
 
