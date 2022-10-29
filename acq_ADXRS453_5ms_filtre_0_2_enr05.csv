@@ -1,0 +1,24 @@
+vitesse SPI : 1953125
+
+T=100ms
+
+Tampon: 0x1e0200a5
+
+T=150ms
+
+Tampon: 0x83ff3ca5
+
+T=200ms
+
+Tampon: 0x892294fe
+
+T=200ms+TD
+
+Tampon: 0x9bff00ff
+
+T=200ms+2TD
+
+Gyroscope trouve
+
+gyro_config ok !
+
