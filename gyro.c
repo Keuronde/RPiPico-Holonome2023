@@ -45,9 +45,9 @@ struct t_angle_gyro_double gyro_get_vitesse(void){
 
 void Gyro_Init(void){
     // 
-    gpio_set_function(16, GPIO_FUNC_SPI); // SDI
-    gpio_set_function(18, GPIO_FUNC_SPI); // SCK
-    gpio_set_function(19, GPIO_FUNC_SPI); // SDO
+    gpio_set_function(0, GPIO_FUNC_SPI); // SDI (ancien : 16)
+    gpio_set_function(2, GPIO_FUNC_SPI); // SCK (ancien : 18)
+    gpio_set_function(3, GPIO_FUNC_SPI); // SDO (ancien : 19)
     gpio_set_function(PIN_CS, GPIO_OUT); // CSn
 
     gpio_init(PIN_CS);
