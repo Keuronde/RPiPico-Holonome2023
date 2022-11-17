@@ -16,6 +16,8 @@ Servomoteur.c
 gyro_L3GD20H.c
 gyro_ADXRS453.c
 QEI.c
+APDS_9960.c
+Moteurs.c
 )
 
 pico_generate_pio_header(test ${CMAKE_CURRENT_LIST_DIR}/quadrature_encoder.pio)
