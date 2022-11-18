@@ -12,6 +12,10 @@ const uint LED_PIN = 25;
 
 #define V_INIT -999.0
 
+int mode_test();
+
+int test_moteurs();
+
 int main() {
     bi_decl(bi_program_description("This is a test binary."));
     bi_decl(bi_1pin_with_name(LED_PIN, "On-board LED"));
@@ -34,6 +38,9 @@ int main() {
     //while(1);
     Temps_init();
     Gyro_Init();
+
+    while(mode_test());
+
     temps_ms = Temps_get_temps_ms();
     temps_ms_old = temps_ms;
     while (1) { 
@@ -84,4 +91,33 @@ int main() {
             //gyro_get_temp();
         }
     }
+}
+
+// Mode test : renvoie 0 pour quitter le mode test
+int mode_test(){
+    printf("Appuyez sur une touche pour entrer en mode test :\n");
+    printf("M - pour les moteurs\n");
+    int rep = getchar_timeout_us(10000000);
+    switch (rep)
+    {
+    case 'M':
+        /* code */
+
+        break;
+    case PICO_ERROR_TIMEOUT:
+        printf("Sortie du mode test\n");
+        return 0;
+
+    default:
+        printf("Commande inconnue\n");
+        return 1;
+        break;
+    }
+    
+}
+
+int test_moteurs(){
+    printf("Indiquez le moteurs à tester (A, B ou C):\n");
+    int moteur = getchar_timeout_us(0);
+    printf("Moteur choisi : %d %x", moteur, moteur);
 }
