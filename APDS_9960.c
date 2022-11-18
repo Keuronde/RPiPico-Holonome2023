@@ -1,4 +1,4 @@
-APDS9960_Init(){
+int APDS9960_Init(){
     // Registres à configurer 
 
 

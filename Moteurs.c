@@ -44,21 +44,21 @@ void Moteur_Init(){
 
     pwm_config_set_clkdiv_int(&pwm_moteur, 2); 
     pwm_config_set_phase_correct(&pwm_moteur, false);
-    pwm_config_set_wrap(&pwm_moteur, 65635);
+    pwm_config_set_wrap(&pwm_moteur, (uint16_t)65635);
 
     pwm_init(slice_moteur_A, &pwm_moteur, true);
     pwm_init(slice_moteur_B, &pwm_moteur, true);
     pwm_init(slice_moteur_C, &pwm_moteur, true);
 
-    Moteur_set_vitesse(MOTEUR_A, 0);
-    Moteur_set_vitesse(MOTEUR_B, 0);
-    Moteur_set_vitesse(MOTEUR_C, 0);
+    Moteur_SetVitesse(MOTEUR_A, 0);
+    Moteur_SetVitesse(MOTEUR_B, 0);
+    Moteur_SetVitesse(MOTEUR_C, 0);
 
 }
 
 
-Moteur_set_vitesse(enum t_moteur moteur, int16 vitesse){
-    uint16 u_vitesse;
+void Moteur_SetVitesse(enum t_moteur moteur, int16_t vitesse ){
+    uint16_t u_vitesse;
 
     // Le PWM accepte 16 bits de résolution, on se remet sur 16 bits (et non sur 15 + signe)
     if (vitesse < 0){
