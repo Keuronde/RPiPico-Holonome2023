@@ -1,5 +1,4 @@
 #include "QEI.h"
-#include "Moteurs.h"
 
 /*** C'est ici que ce fait la conversion en mm 
  * ***/
@@ -21,24 +20,24 @@ double commande_I[3]; // Terme integral
 
 
 
-void AsserMoteur_setConsigne_mm_s(enum moteur_t moteur, double _consigne_mm_s){
+void AsserMoteur_setConsigne_mm_s(enum t_moteur moteur, double _consigne_mm_s){
     consigne_mm_s[moteur] = _consigne_mm_s;
 
 }
 
-double AsserMoteur_getVitesse_mm_s(enum moteur_t moteur){
+double AsserMoteur_getVitesse_mm_s(enum t_moteur moteur){
     return (double) QEI_get(moteur) * (double)IMPULSION_PAR_MM;
 }
 
-AsserMoteur_Gestion(int step_ms){
+void AsserMoteur_Gestion(int step_ms){
     // Pour chaque moteur
-    for(uint moteur=MOTEUR_A, i<MOTEUR_C+1; i++ ){
+    for(uint moteur=MOTEUR_A; moteur<MOTEUR_C+1; moteur++ ){
         double erreur; // Erreur entre la consigne et la vitesse actuelle
         double commande_P; // Terme proportionnel
         double commande;
         
         // Calcul de l'erreur
-        erreur = consigne_mm_s - AsserMoteur_getVitesse_mm_s(moteur);
+        erreur = consigne_mm_s[moteur] - AsserMoteur_getVitesse_mm_s(moteur);
 
         // Calcul du terme propotionnel
         commande_P = erreur * ASSERMOTEUR_GAIN_P;
@@ -46,7 +45,7 @@ AsserMoteur_Gestion(int step_ms){
         // Calcul du terme integral
         commande_I[moteur] = commande_I[moteur] + (erreur * ASSERMOTEUR_GAIN_I * step_ms);
 
-        commande = commande_P + commande_I;
+        commande = commande_P + commande_I[moteur];
 
         Moteur_SetVitesse(moteur, commande);
 

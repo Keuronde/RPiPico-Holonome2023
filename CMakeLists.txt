@@ -9,6 +9,7 @@ pico_sdk_init()
 
 add_executable(test
 test.c
+Asser_Moteurs.c
 spi_nb.c
 gyro.c
 Temps.c
