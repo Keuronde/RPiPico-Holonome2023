@@ -15,7 +15,7 @@
 
 uint slice_moteur_A, slice_moteur_B, slice_moteur_C;
 
-
+/// @brief Initialisation les entrées / sorties requises pour les moteurs
 void Moteur_Init(){
     // Initialisation des broches pour les PWM
     gpio_set_function(MOTEUR_A_VITESSE, GPIO_FUNC_PWM);
@@ -26,9 +26,9 @@ void Moteur_Init(){
     gpio_init(MOTEUR_A_SENS);
     gpio_init(MOTEUR_B_SENS);
     gpio_init(MOTEUR_C_SENS);
-    gpio_set_dir(MOTEUR_A_SENS, true);
-    gpio_set_dir(MOTEUR_B_SENS, true);
-    gpio_set_dir(MOTEUR_C_SENS, true);
+    gpio_set_dir(MOTEUR_A_SENS, GPIO_OUT);
+    gpio_set_dir(MOTEUR_B_SENS, GPIO_OUT);
+    gpio_set_dir(MOTEUR_C_SENS, GPIO_OUT);
 
     // Configuration des PWM à 1 kHz
     // Clock_system 125 MHz - 16 bits PWM (65536)
@@ -44,7 +44,7 @@ void Moteur_Init(){
 
     pwm_config_set_clkdiv_int(&pwm_moteur, 2); 
     pwm_config_set_phase_correct(&pwm_moteur, false);
-    pwm_config_set_wrap(&pwm_moteur, (uint16_t)65635);
+    pwm_config_set_wrap(&pwm_moteur, (uint16_t)65535);
 
     pwm_init(slice_moteur_A, &pwm_moteur, true);
     pwm_init(slice_moteur_B, &pwm_moteur, true);
@@ -57,6 +57,9 @@ void Moteur_Init(){
 }
 
 
+/// @brief Configure le PWM et la broche de sens en fonction de la vitesse et du moteur
+/// @param moteur : Moteur (voir enum t_moteur)
+/// @param vitesse : Vitesse entre -32767 et 32767
 void Moteur_SetVitesse(enum t_moteur moteur, int16_t vitesse ){
     uint16_t u_vitesse;
 
@@ -70,27 +73,27 @@ void Moteur_SetVitesse(enum t_moteur moteur, int16_t vitesse ){
         case MOTEUR_A:
             pwm_set_chan_level(slice_moteur_A, PWM_CHAN_A, u_vitesse);
             if(vitesse < 0){
-                gpio_put(MOTEUR_A_SENS, false);
+                gpio_put(MOTEUR_A_SENS, 0);
             }else{
-                gpio_put(MOTEUR_A_SENS, true);
+                gpio_put(MOTEUR_A_SENS, 1);
             }
             break;
 
         case MOTEUR_B:
             pwm_set_chan_level(slice_moteur_B, PWM_CHAN_A, u_vitesse);
             if(vitesse < 0){
-                gpio_put(MOTEUR_B_SENS, false);
+                gpio_put(MOTEUR_B_SENS, 0);
             }else{
-                gpio_put(MOTEUR_B_SENS, true);
+                gpio_put(MOTEUR_B_SENS, 1);
             }
             break;
 
         case MOTEUR_C:
             pwm_set_chan_level(slice_moteur_C, PWM_CHAN_A, u_vitesse);
             if(vitesse < 0){
-                gpio_put(MOTEUR_B_SENS, false);
+                gpio_put(MOTEUR_C_SENS, 0);
             }else{
-                gpio_put(MOTEUR_B_SENS, true);
+                gpio_put(MOTEUR_C_SENS, 1);
             }
             break;
     }
