@@ -54,18 +54,18 @@ void QEI_update(){
 
 }
 
-int QEI_get(enum t_moteur moteur){
-    switch (moteur)
+int QEI_get(enum QEI_name_t qei){
+    switch (qei)
     {
-    case MOTEUR_A:
+    case QEI_A_NAME:
         return QEI_A.value;
         break;
 
-    case MOTEUR_B:
+    case QEI_B_NAME:
         return QEI_B.value;
         break;
     
-    case MOTEUR_C:
+    case QEI_C_NAME:
         return QEI_C.value;
         break;
     

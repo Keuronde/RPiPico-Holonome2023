@@ -7,6 +7,7 @@
 #include "Temps.h"
 #include "spi_nb.h"
 #include "Servomoteur.h"
+#include "Moteurs.h"
 #include "QEI.h"
 
 const uint LED_PIN = 25;

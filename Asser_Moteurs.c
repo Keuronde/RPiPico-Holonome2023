@@ -1,4 +1,5 @@
 #include "QEI.h"
+#include "Moteurs.h"
 
 /*** C'est ici que ce fait la conversion en mm 
  * ***/
@@ -26,7 +27,16 @@ void AsserMoteur_setConsigne_mm_s(enum t_moteur moteur, double _consigne_mm_s){
 }
 
 double AsserMoteur_getVitesse_mm_s(enum t_moteur moteur){
-    return (double) QEI_get(moteur) * (double)IMPULSION_PAR_MM;
+    enum QEI_name_t qei;
+    switch (moteur)
+    {
+    case MOTEUR_A: qei = QEI_A_NAME; break;
+    case MOTEUR_B: qei = QEI_B_NAME; break;
+    case MOTEUR_C: qei = QEI_C_NAME; break;
+    
+    default: break;
+    }
+    return (double) QEI_get(qei) / (double)IMPULSION_PAR_MM;
 }
 
 void AsserMoteur_Gestion(int step_ms){
