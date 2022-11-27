@@ -11,12 +11,16 @@
 #include "QEI.h"
 
 const uint LED_PIN = 25;
+const uint LED_PIN_ROUGE = 28;
+const uint LED_PIN_NE_PAS_UTILISER = 22;
+
 
 #define V_INIT -999.0
 #define TEST_TIMEOUT_US 10000000
 
 int mode_test();
 int test_moteurs();
+int test_QIE();
 int test_vitesse_moteur(enum t_moteur moteur);
 
 int main() {
@@ -33,6 +37,15 @@ int main() {
     gpio_set_dir(LED_PIN, GPIO_OUT);
     gpio_put(LED_PIN, 1);
 
+    gpio_init(LED_PIN_ROUGE);
+    gpio_set_dir(LED_PIN_ROUGE, GPIO_OUT);
+    gpio_put(LED_PIN_ROUGE, 1);
+
+    // Il fuat neutraliser cettte broche qui pourrait interférer avec 
+    // la lecture des codeurs. (problème sur la carte électrique)...
+    gpio_init(LED_PIN_NE_PAS_UTILISER);
+    gpio_set_dir(LED_PIN_NE_PAS_UTILISER, GPIO_IN);
+
     sleep_ms(3000);
     Servomoteur_Init();
     //puts("Debut");
@@ -41,6 +54,7 @@ int main() {
     //while(1);
     Temps_init();
     Moteur_Init();
+    QEI_init();
 
     while(mode_test());
 
@@ -104,12 +118,17 @@ int main() {
 int mode_test(){
     static int iteration = 3;
     printf("Appuyez sur une touche pour entrer en mode test :\n");
+    printf("C - pour les codeurs\n");
     printf("M - pour les moteurs\n");
     stdio_flush();
     int rep = getchar_timeout_us(TEST_TIMEOUT_US);
     stdio_flush();
     switch (rep)
     {
+    case 'C':
+    case 'c':
+        while(test_QIE());
+        break;
     case 'M':
     case 'm':
         /* code */
@@ -130,15 +149,29 @@ int mode_test(){
     
 }
 
+int test_QIE(){
+    int lettre;
+    printf("Affichage des QEI :\nAppuyez sur une touche pour quitter\n");
+    do{
+        QEI_update();
+        printf("Codeur a : %d, codeur B : %d, codeur C : %d\n", QEI_get(QEI_A_NAME), QEI_get(QEI_B_NAME), QEI_get(QEI_C_NAME));
+        sleep_ms(100);
+
+        lettre = getchar_timeout_us(0);
+    }while(lettre == PICO_ERROR_TIMEOUT);
+    return 0;
+
+}
+
 int test_moteurs(){
     int lettre_moteur;
 
     printf("Indiquez le moteurs à tester (A, B ou C):\n");
     do{
          lettre_moteur = getchar_timeout_us(TEST_TIMEOUT_US);
+         stdio_flush();
     }while(lettre_moteur == PICO_ERROR_TIMEOUT);
     printf("Moteur choisi : %c %d %x\n", lettre_moteur, lettre_moteur, lettre_moteur);
-    stdio_flush();
 
     switch (lettre_moteur)
     {
@@ -175,8 +208,8 @@ int test_vitesse_moteur(enum t_moteur moteur){
     int vitesse_moteur;
     do{ 
         vitesse_moteur = getchar_timeout_us(TEST_TIMEOUT_US);
+        stdio_flush();
     }while(vitesse_moteur == PICO_ERROR_TIMEOUT);
-    stdio_flush();
     
     switch (vitesse_moteur)
     {
@@ -210,5 +243,4 @@ int test_vitesse_moteur(enum t_moteur moteur){
         break;
     }
     return 1;
-
 }
