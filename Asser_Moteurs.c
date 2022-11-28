@@ -1,7 +1,7 @@
 #include "QEI.h"
 #include "Moteurs.h"
 
-/*** C'est ici que ce fait la conversion en mm 
+/*** C'est ici que se fait la conversion en mm 
  * ***/
 
 // Roues 60 mm de diamètre, 188,5 mm de circonférence
@@ -13,12 +13,18 @@
 // Impulsion / mm : 42,44
 
 #define IMPULSION_PAR_MM (42.44f)
-#define ASSERMOTEUR_GAIN_P 20
-#define ASSERMOTEUR_GAIN_I 0.0f
+#define ASSERMOTEUR_GAIN_P 160
+#define ASSERMOTEUR_GAIN_I .80f
 
 double consigne_mm_s[3]; // Consigne de vitesse (en mm/s)
 double commande_I[3]; // Terme integral
 
+void AsserMoteur_Init(){
+    for(unsigned int i =0; i< 3; i ++){
+        commande_I[i]=0;
+        consigne_mm_s[i]=0;
+    }
+}
 
 
 void AsserMoteur_setConsigne_mm_s(enum t_moteur moteur, double _consigne_mm_s){
@@ -26,8 +32,9 @@ void AsserMoteur_setConsigne_mm_s(enum t_moteur moteur, double _consigne_mm_s){
 
 }
 
-double AsserMoteur_getVitesse_mm_s(enum t_moteur moteur){
+double AsserMoteur_getVitesse_mm_s(enum t_moteur moteur, int step_ms){
     enum QEI_name_t qei;
+    double distance, temps;
     switch (moteur)
     {
     case MOTEUR_A: qei = QEI_A_NAME; break;
@@ -36,7 +43,10 @@ double AsserMoteur_getVitesse_mm_s(enum t_moteur moteur){
     
     default: break;
     }
-    return (double) QEI_get(qei) / (double)IMPULSION_PAR_MM;
+    distance = (double) QEI_get(qei) / (double)IMPULSION_PAR_MM;
+    temps = step_ms / 1000.0;
+
+    return distance / temps;
 }
 
 void AsserMoteur_Gestion(int step_ms){
@@ -47,7 +57,7 @@ void AsserMoteur_Gestion(int step_ms){
         double commande;
         
         // Calcul de l'erreur
-        erreur = consigne_mm_s[moteur] - AsserMoteur_getVitesse_mm_s(moteur);
+        erreur = consigne_mm_s[moteur] - AsserMoteur_getVitesse_mm_s(moteur, step_ms);
 
         // Calcul du terme propotionnel
         commande_P = erreur * ASSERMOTEUR_GAIN_P;
@@ -56,6 +66,10 @@ void AsserMoteur_Gestion(int step_ms){
         commande_I[moteur] = commande_I[moteur] + (erreur * ASSERMOTEUR_GAIN_I * step_ms);
 
         commande = commande_P + commande_I[moteur];
+
+        //Saturation de la commande
+        if(commande > 32760) {commande = 32760;}
+        if(commande < -32760) {commande = -32760;}
 
         Moteur_SetVitesse(moteur, commande);
 

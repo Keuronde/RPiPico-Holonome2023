@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "pico/multicore.h"
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "pico/binary_info.h"
@@ -9,6 +10,7 @@
 #include "Servomoteur.h"
 #include "Moteurs.h"
 #include "QEI.h"
+#include "Asser_Moteurs.h"
 
 const uint LED_PIN = 25;
 const uint LED_PIN_ROUGE = 28;
@@ -22,6 +24,7 @@ int mode_test();
 int test_moteurs();
 int test_QIE();
 int test_vitesse_moteur(enum t_moteur moteur);
+int test_asser_moteur();
 
 int main() {
     bi_decl(bi_program_description("This is a test binary."));
@@ -55,6 +58,7 @@ int main() {
     Temps_init();
     Moteur_Init();
     QEI_init();
+    AsserMoteur_Init();
 
     while(mode_test());
 
@@ -125,6 +129,10 @@ int mode_test(){
     stdio_flush();
     switch (rep)
     {
+    case 'a':
+    case 'A':
+        while(test_asser_moteur());
+        break;
     case 'C':
     case 'c':
         while(test_QIE());
@@ -149,12 +157,43 @@ int mode_test(){
     
 }
 
+
+void test_asser_moteur_printf(){
+    int _step_ms = 1;
+    while(1){
+        printf("Vitesse A : %.0f, vitesse B : %.0f, vitesse C : %.0f\n", AsserMoteur_getVitesse_mm_s(MOTEUR_A, _step_ms),
+            AsserMoteur_getVitesse_mm_s(MOTEUR_B, _step_ms), AsserMoteur_getVitesse_mm_s(MOTEUR_C, _step_ms));
+        //sleep_ms(5);
+    }
+}
+
+int test_asser_moteur(){
+    int lettre;
+    int _step_ms = 1;
+    printf("Asservissement des moteurs :\nAppuyez sur une touche pour quitter\n");
+    AsserMoteur_setConsigne_mm_s(MOTEUR_A, 500);
+    AsserMoteur_setConsigne_mm_s(MOTEUR_B, 500);
+    AsserMoteur_setConsigne_mm_s(MOTEUR_C, 500);
+    multicore_launch_core1(test_asser_moteur_printf);
+    do{
+        QEI_update();
+        AsserMoteur_Gestion(_step_ms);
+        sleep_ms(_step_ms);
+        //printf("Vitesse A : %d, codeur B : %d, codeur C : %d\n", QEI_get(QEI_A_NAME), QEI_get(QEI_B_NAME), QEI_get(QEI_C_NAME));
+        //printf("Vitesse A : %.0f, vitesse B : %.0f, vitesse C : %.0f\n", AsserMoteur_getVitesse_mm_s(MOTEUR_A, _step_ms),
+        //    AsserMoteur_getVitesse_mm_s(MOTEUR_B, _step_ms), AsserMoteur_getVitesse_mm_s(MOTEUR_C, _step_ms));
+        lettre = getchar_timeout_us(0);
+    }while(lettre == PICO_ERROR_TIMEOUT);
+    multicore_reset_core1();
+    return 0;
+}
+
 int test_QIE(){
     int lettre;
     printf("Affichage des QEI :\nAppuyez sur une touche pour quitter\n");
     do{
         QEI_update();
-        printf("Codeur a : %d, codeur B : %d, codeur C : %d\n", QEI_get(QEI_A_NAME), QEI_get(QEI_B_NAME), QEI_get(QEI_C_NAME));
+        printf("Codeur A : %d, codeur B : %d, codeur C : %d\n", QEI_get(QEI_A_NAME), QEI_get(QEI_B_NAME), QEI_get(QEI_C_NAME));
         sleep_ms(100);
 
         lettre = getchar_timeout_us(0);
