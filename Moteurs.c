@@ -67,7 +67,7 @@ void Moteur_SetVitesse(enum t_moteur moteur, int16_t vitesse ){
     if (vitesse < 0){
         u_vitesse = -vitesse;
     }
-    u_vitesse = vitesse * 2;
+    u_vitesse = u_vitesse * 2;
 
     switch(moteur){
         case MOTEUR_A:
