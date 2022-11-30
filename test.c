@@ -25,6 +25,7 @@ int test_moteurs();
 int test_QIE();
 int test_vitesse_moteur(enum t_moteur moteur);
 int test_asser_moteur();
+int test_avance(void);
 
 int main() {
     bi_decl(bi_program_description("This is a test binary."));
@@ -122,6 +123,8 @@ int main() {
 int mode_test(){
     static int iteration = 3;
     printf("Appuyez sur une touche pour entrer en mode test :\n");
+    printf("A - pour asser_moteurs\n");
+    printf("B - pour avance (asser_moteur)\n");
     printf("C - pour les codeurs\n");
     printf("M - pour les moteurs\n");
     stdio_flush();
@@ -133,6 +136,11 @@ int mode_test(){
     case 'A':
         while(test_asser_moteur());
         break;
+    case 'b':
+    case 'B':
+        while(test_avance());
+        break;
+        
     case 'C':
     case 'c':
         while(test_QIE());
@@ -157,6 +165,26 @@ int mode_test(){
     
 }
 
+
+int test_avance(void){
+    int lettre;
+    int _step_ms = 1;
+    AsserMoteur_setConsigne_mm_s(MOTEUR_A, 500);
+    AsserMoteur_setConsigne_mm_s(MOTEUR_B, -500);
+    AsserMoteur_setConsigne_mm_s(MOTEUR_C, 0);
+    
+    do{
+        QEI_update();
+        AsserMoteur_Gestion(_step_ms);
+        sleep_ms(_step_ms);
+        lettre = getchar_timeout_us(0);
+
+    }while(lettre == PICO_ERROR_TIMEOUT);
+    Moteur_SetVitesse(MOTEUR_A, 0);
+    Moteur_SetVitesse(MOTEUR_B, 0);
+    Moteur_SetVitesse(MOTEUR_C, 0);
+    return 0;
+}
 
 void test_asser_moteur_printf(){
     int _step_ms = 1;
@@ -184,6 +212,9 @@ int test_asser_moteur(){
         //    AsserMoteur_getVitesse_mm_s(MOTEUR_B, _step_ms), AsserMoteur_getVitesse_mm_s(MOTEUR_C, _step_ms));
         lettre = getchar_timeout_us(0);
     }while(lettre == PICO_ERROR_TIMEOUT);
+    Moteur_SetVitesse(MOTEUR_A, 0);
+    Moteur_SetVitesse(MOTEUR_B, 0);
+    Moteur_SetVitesse(MOTEUR_C, 0);
     multicore_reset_core1();
     return 0;
 }
@@ -271,7 +302,12 @@ int test_vitesse_moteur(enum t_moteur moteur){
         printf("Vitesse choisie : 100%%\n");
         Moteur_SetVitesse(moteur, (int16_t) 32766.0);
         break;
-        
+
+    case 'b':
+    case 'B':
+        printf("Vitesse choisie : -50%%\n");
+        Moteur_SetVitesse(moteur, (int16_t) -32766.0/2);
+        break;
 
     case 'q':
     case 'Q':

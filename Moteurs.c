@@ -66,6 +66,8 @@ void Moteur_SetVitesse(enum t_moteur moteur, int16_t vitesse ){
     // Le PWM accepte 16 bits de résolution, on se remet sur 16 bits (et non sur 15 + signe)
     if (vitesse < 0){
         u_vitesse = -vitesse;
+    }else{
+        u_vitesse = vitesse;
     }
     u_vitesse = u_vitesse * 2;
 
