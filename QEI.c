@@ -6,6 +6,21 @@
 #include "quadrature_encoder.pio.h"
 
 
+/*** C'est ici que se fait la conversion en mm 
+ * ***/
+
+// Roues 60 mm de diamètre, 188,5 mm de circonférence
+// Réduction Moteur 30:1
+// Réduction poulie 16:12
+// Nombre d'impulsions par tour moteur : 200
+// Nombre d'impulsions par tour réducteur : 6000
+// Nombre d'impulsions par tour de roue : 8000
+// Impulsion / mm : 42,44
+
+#define IMPULSION_PAR_MM (42.44f)
+#define ASSERMOTEUR_GAIN_P 160
+#define ASSERMOTEUR_GAIN_I .80f
+
 struct QEI_t QEI_A, QEI_B, QEI_C;
 
 PIO pio_QEI = pio0;
@@ -89,4 +104,11 @@ int QEI_get(enum QEI_name_t qei){
     default:
         break;
     }
+}
+
+/// @brief Renvoi la distance parcourue en mm depuis la lecture précédente
+/// @param  qei : Nom du module à lire (QEI_A_NAME, QEI_B_NAME ou QEI_C_NAME)
+/// @return la distance parcourue en mm calculée lors du dernier appel de la function QEI_Update()
+double QEI_get_mm(enum QEI_name_t qei){
+    return (double) QEI_get(qei) / (double)IMPULSION_PAR_MM;
 }
