@@ -9,17 +9,17 @@ pico_sdk_init()
 
 add_executable(test
 test.c
+APDS_9960.c
 Asser_Moteurs.c
-spi_nb.c
+QEI.c
 gyro.c
-Temps.c
-Servomoteur.c
 gyro_L3GD20H.c
 gyro_ADXRS453.c
-QEI.c
-APDS_9960.c
+Localisation.c
 Moteurs.c
-)
+Temps.c
+Servomoteur.c
+spi_nb.c)
 
 pico_generate_pio_header(test ${CMAKE_CURRENT_LIST_DIR}/quadrature_encoder.pio)
 

@@ -1,5 +1,6 @@
 #include "QEI.h"
 #include "Moteurs.h"
+#include "Asser_Moteurs.h"
 
 /*** C'est ici que se fait la conversion en mm 
  * ***/
@@ -43,7 +44,7 @@ double AsserMoteur_getVitesse_mm_s(enum t_moteur moteur, int step_ms){
     
     default: break;
     }
-    distance = (double) QEI_get(qei) / (double)IMPULSION_PAR_MM;
+    distance = QEI_get_mm(qei);
     temps = step_ms / 1000.0;
 
     return distance / temps;

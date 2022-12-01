@@ -11,6 +11,7 @@
 #include "Moteurs.h"
 #include "QEI.h"
 #include "Asser_Moteurs.h"
+#include "Localisation.h"
 
 const uint LED_PIN = 25;
 const uint LED_PIN_ROUGE = 28;
@@ -23,8 +24,10 @@ const uint LED_PIN_NE_PAS_UTILISER = 22;
 int mode_test();
 int test_moteurs();
 int test_QIE();
+int test_QIE_mm();
 int test_vitesse_moteur(enum t_moteur moteur);
-int test_asser_moteur();
+int test_asser_moteur(void);
+int test_localisation(void);
 int test_avance(void);
 
 int main() {
@@ -60,6 +63,7 @@ int main() {
     Moteur_Init();
     QEI_init();
     AsserMoteur_Init();
+    Localisation_init();
 
     while(mode_test());
 
@@ -123,10 +127,12 @@ int main() {
 int mode_test(){
     static int iteration = 3;
     printf("Appuyez sur une touche pour entrer en mode test :\n");
-    printf("A - pour asser_moteurs\n");
+    printf("A - pour asser_moteurs (rotation)\n");
     printf("B - pour avance (asser_moteur)\n");
     printf("C - pour les codeurs\n");
+    printf("D - pour les codeurs (somme en mm)\n");
     printf("M - pour les moteurs\n");
+    printf("L - pour la localisation\n");
     stdio_flush();
     int rep = getchar_timeout_us(TEST_TIMEOUT_US);
     stdio_flush();
@@ -145,10 +151,21 @@ int mode_test(){
     case 'c':
         while(test_QIE());
         break;
+
+    case 'D':
+    case 'd':
+        while(test_QIE_mm());
+        break;
+        
     case 'M':
     case 'm':
         /* code */
         while(test_moteurs());
+        break;
+    case 'L':
+    case 'l':
+        /* code */
+        while(test_localisation());
         break;
     case PICO_ERROR_TIMEOUT:
         iteration--;        
@@ -224,13 +241,53 @@ int test_QIE(){
     printf("Affichage des QEI :\nAppuyez sur une touche pour quitter\n");
     do{
         QEI_update();
-        printf("Codeur A : %d, codeur B : %d, codeur C : %d\n", QEI_get(QEI_A_NAME), QEI_get(QEI_B_NAME), QEI_get(QEI_C_NAME));
+        printf("Codeur A : %d (%3.2f mm), codeur B : %d (%3.2f mm), codeur C : %d (%3.2f mm)\n", 
+            QEI_get(QEI_A_NAME), QEI_get_mm(QEI_A_NAME),
+            QEI_get(QEI_B_NAME), QEI_get_mm(QEI_B_NAME),
+            QEI_get(QEI_C_NAME), QEI_get_mm(QEI_C_NAME));
         sleep_ms(100);
 
         lettre = getchar_timeout_us(0);
     }while(lettre == PICO_ERROR_TIMEOUT);
     return 0;
 
+}
+
+int test_QIE_mm(){
+    int lettre;
+    printf("Affichage des QEI :\nAppuyez sur une touche pour quitter\n");
+    double a_mm=0, b_mm=0, c_mm=0;
+    do{
+        QEI_update();
+        a_mm += QEI_get_mm(QEI_A_NAME);
+        b_mm += QEI_get_mm(QEI_B_NAME);
+        c_mm += QEI_get_mm(QEI_C_NAME);
+        printf("Codeur A : %3.2f mm, codeur B : %3.2f mm, codeur C : %3.2f mm\n", a_mm, b_mm, c_mm);
+        sleep_ms(100);
+
+        lettre = getchar_timeout_us(0);
+    }while(lettre == PICO_ERROR_TIMEOUT);
+    return 0;
+
+}
+
+int test_localisation(){
+    int lettre;
+    struct position_t position;
+    
+    printf("Affichage de la position du robot.\nAppuyez sur une touche pour quitter\n");
+    do{
+        QEI_update();
+        Localisation_gestion();
+        position = Localisation_get();
+        printf("X: %f, Y: %f, angle: %f\n", position.x_mm, position.y_mm, position.angle_radian *180. / 3.141592654);
+        sleep_ms(100);
+
+        lettre = getchar_timeout_us(0);
+    }while(lettre == PICO_ERROR_TIMEOUT);
+
+    return 0;
+    
 }
 
 int test_moteurs(){
