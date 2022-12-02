@@ -17,7 +17,7 @@
 // Nombre d'impulsions par tour de roue : 8000
 // Impulsion / mm : 42,44
 
-#define IMPULSION_PAR_MM (42.44f)
+#define IMPULSION_PAR_MM (95.4929658551372f)
 #define ASSERMOTEUR_GAIN_P 160
 #define ASSERMOTEUR_GAIN_I .80f
 
