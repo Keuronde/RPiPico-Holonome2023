@@ -1,9 +1,7 @@
 #include "Localisation.h"
 #include "QEI.h"
 #include "math.h"
-
-#define DISTANCE_ROUES_CENTRE_MM 84.25
-#define RACINE_DE_3 1.73205081
+#include "Geometrie_robot.h"
 
 struct position_t position;
 
