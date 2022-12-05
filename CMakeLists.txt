@@ -11,6 +11,7 @@ add_executable(test
 test.c
 APDS_9960.c
 Asser_Moteurs.c
+Commande_vitesse.c
 QEI.c
 gyro.c
 gyro_L3GD20H.c

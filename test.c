@@ -12,6 +12,8 @@
 #include "QEI.h"
 #include "Asser_Moteurs.h"
 #include "Localisation.h"
+#include "Commande_vitesse.h"
+#include "math.h"
 
 const uint LED_PIN = 25;
 const uint LED_PIN_ROUGE = 28;
@@ -29,6 +31,9 @@ int test_vitesse_moteur(enum t_moteur moteur);
 int test_asser_moteur(void);
 int test_localisation(void);
 int test_avance(void);
+int test_cde_vitesse_rotation();
+int test_cde_vitesse_rectangle();
+int test_cde_vitesse_cercle();
 
 int main() {
     bi_decl(bi_program_description("This is a test binary."));
@@ -131,6 +136,9 @@ int mode_test(){
     printf("B - pour avance (asser_moteur)\n");
     printf("C - pour les codeurs\n");
     printf("D - pour les codeurs (somme en mm)\n");
+    printf("E - Commande en vitesse - rotation pure\n");
+    printf("F - Commande en vitesse - carré\n");
+    printf("G - Commande en vitesse - cercle\n");
     printf("M - pour les moteurs\n");
     printf("L - pour la localisation\n");
     stdio_flush();
@@ -155,6 +163,21 @@ int mode_test(){
     case 'D':
     case 'd':
         while(test_QIE_mm());
+        break;
+
+    case 'E':
+    case 'e':
+        while(test_cde_vitesse_rotation());
+        break;
+
+    case 'F':
+    case 'f':
+        while(test_cde_vitesse_rectangle());
+        break;
+
+    case 'G':
+    case 'g':
+        while(test_cde_vitesse_cercle());
         break;
         
     case 'M':
@@ -182,6 +205,69 @@ int mode_test(){
     
 }
 
+
+int test_cde_vitesse_rotation(){
+    int lettre, _step_ms = 1;
+    double vitesse =90.0/2 * 3.14159 /180.0;
+    printf("Rotation du robot sur lui-même en 8 secondes\nVitesse : %f rad/s\n", vitesse);
+
+    commande_vitesse(0, 0, vitesse);
+    do{
+        QEI_update();
+        AsserMoteur_Gestion(_step_ms);
+        sleep_ms(_step_ms);
+        lettre = getchar_timeout_us(0);
+    }while(lettre == PICO_ERROR_TIMEOUT);
+
+    return 0;
+}
+
+int test_cde_vitesse_rectangle(){
+    int lettre, _step_ms = 1, temps_ms=0;
+
+    printf("déplacement en rectangle du robot : 500x200 mm, 100 mm/s\n");
+    do{
+        QEI_update();
+        AsserMoteur_Gestion(_step_ms);
+
+        if(temps_ms < 5000){
+            commande_vitesse(0, 100, 0);
+        }else if(temps_ms < 7000){
+            commande_vitesse(-100, 0, 0);
+        }else if(temps_ms < 12000){
+            commande_vitesse(0, -100, 0);
+        }else if(temps_ms < 14000){
+            commande_vitesse(100, 0, 0);
+        }else{
+            temps_ms = 0;
+        }
+        
+        sleep_ms(_step_ms);
+        temps_ms += _step_ms;
+        lettre = getchar_timeout_us(0);
+    }while(lettre == PICO_ERROR_TIMEOUT);
+
+    return 0;
+}
+
+int test_cde_vitesse_cercle(){
+    int lettre, _step_ms = 1, temps_ms=0;
+    uint64_t t_apres, t_avant;
+
+    printf("déplacement en cercle du robot : 100 mm/s\n");
+    do{
+        QEI_update();
+        AsserMoteur_Gestion(_step_ms);
+        commande_vitesse(cos((double)temps_ms / 1000.) * 200.0, sin((double)temps_ms /1000.) * 200.0, 0);
+        temps_ms += _step_ms;
+        sleep_ms(_step_ms);
+        
+
+        lettre = getchar_timeout_us(0);
+    }while(lettre == PICO_ERROR_TIMEOUT);
+
+    return 0;
+}
 
 int test_avance(void){
     int lettre;
@@ -216,9 +302,9 @@ int test_asser_moteur(){
     int lettre;
     int _step_ms = 1;
     printf("Asservissement des moteurs :\nAppuyez sur une touche pour quitter\n");
-    AsserMoteur_setConsigne_mm_s(MOTEUR_A, 500);
-    AsserMoteur_setConsigne_mm_s(MOTEUR_B, 500);
-    AsserMoteur_setConsigne_mm_s(MOTEUR_C, 500);
+    AsserMoteur_setConsigne_mm_s(MOTEUR_A, 100);
+    AsserMoteur_setConsigne_mm_s(MOTEUR_B, 100);
+    AsserMoteur_setConsigne_mm_s(MOTEUR_C, 100);
     multicore_launch_core1(test_asser_moteur_printf);
     do{
         QEI_update();
