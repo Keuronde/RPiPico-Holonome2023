@@ -1,7 +1,10 @@
 #include "Asser_Moteurs.h"
 #include "Geometrie_robot.h"
 
-
+/// @brief Commande de la vitesse dans le référentiel du robot
+/// @param vitesse_x_mm_s : Vitesse x en mm/s dans le référentiel du robot
+/// @param vitesse_y_mm_s : Vitesse y en mm/s dans le référentiel du robot
+/// @param orientation_radian_s : Rotation en radian/s dans le référentiel du robot
 void commande_vitesse(double vitesse_x_mm_s, double vitesse_y_mm_s, double orientation_radian_s){
     double vitesse_roue_a, vitesse_roue_b, vitesse_roue_c;
 

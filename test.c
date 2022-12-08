@@ -3,6 +3,7 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "pico/binary_info.h"
+#include "math.h"
 
 #include "gyro.h"
 #include "Temps.h"
@@ -13,7 +14,8 @@
 #include "Asser_Moteurs.h"
 #include "Localisation.h"
 #include "Commande_vitesse.h"
-#include "math.h"
+#include "Asser_Position.h"
+
 
 const uint LED_PIN = 25;
 const uint LED_PIN_ROUGE = 28;
@@ -34,6 +36,9 @@ int test_avance(void);
 int test_cde_vitesse_rotation();
 int test_cde_vitesse_rectangle();
 int test_cde_vitesse_cercle();
+int test_asser_position_avance();
+int test_asser_position_avance_et_tourne();
+void affiche_localisation();
 
 int main() {
     bi_decl(bi_program_description("This is a test binary."));
@@ -139,6 +144,8 @@ int mode_test(){
     printf("E - Commande en vitesse - rotation pure\n");
     printf("F - Commande en vitesse - carré\n");
     printf("G - Commande en vitesse - cercle\n");
+    printf("H - Asser Position - avance\n");
+    printf("I - Asser Position - avance et tourne\n");
     printf("M - pour les moteurs\n");
     printf("L - pour la localisation\n");
     stdio_flush();
@@ -179,6 +186,16 @@ int mode_test(){
     case 'g':
         while(test_cde_vitesse_cercle());
         break;
+
+    case 'H':
+    case 'h':
+        while(test_asser_position_avance());
+        break;
+
+    case 'I':
+    case 'i':
+        while(test_asser_position_avance_et_tourne());
+        break;
         
     case 'M':
     case 'm':
@@ -205,6 +222,74 @@ int mode_test(){
     
 }
 
+int test_asser_position_avance_et_tourne(){
+    int lettre, _step_ms = 1, temps_ms=0;
+    struct position_t position_consigne;
+
+    position_consigne.angle_radian = 0;
+    position_consigne.x_mm = 0;
+    position_consigne.y_mm = 0;
+    
+    printf("Le robot avance à 100 mm/s\n");
+    multicore_launch_core1(affiche_localisation);
+    do{
+        QEI_update();
+        Localisation_gestion();
+        AsserMoteur_Gestion(_step_ms);
+        
+        position_consigne.angle_radian = (double) temps_ms /1000. ;
+        /*
+        if(temps_ms < 10000){
+            position_consigne.y_mm = (double) temps_ms * 100. / 1000.;
+        }else if(temps_ms < 10000){ 
+            position_consigne.y_mm = 1000 - (double) temps_ms * 100. / 1000.;
+        }else{
+            temps_ms = 0;
+        }*/
+
+        position_consigne.y_mm = (double) temps_ms * 100. / 1000.;
+
+        Asser_Position(position_consigne);
+        temps_ms += _step_ms;
+        sleep_ms(_step_ms);
+
+        lettre = getchar_timeout_us(0);
+    }while(lettre == PICO_ERROR_TIMEOUT);
+
+    return 0;
+}
+
+int test_asser_position_avance(){
+    int lettre, _step_ms = 1, temps_ms=0;
+    struct position_t position;
+
+    position.angle_radian = 0;
+    position.x_mm = 0;
+    position.y_mm = 0;
+    
+    printf("Le robot avance à 100 mm/s\n");
+    do{
+        QEI_update();
+        Localisation_gestion();
+        AsserMoteur_Gestion(_step_ms);
+        
+        if(temps_ms < 5000){
+            position.x_mm = (double) temps_ms * 100. / 1000.;
+        }else if(temps_ms < 10000){ 
+            position.x_mm = 1000 - (double) temps_ms * 100. / 1000.;
+        }else{
+            temps_ms = 0;
+        }
+
+        Asser_Position(position);
+        temps_ms += _step_ms;
+        sleep_ms(_step_ms);
+
+        lettre = getchar_timeout_us(0);
+    }while(lettre == PICO_ERROR_TIMEOUT);
+
+    return 0;
+}
 
 int test_cde_vitesse_rotation(){
     int lettre, _step_ms = 1;
@@ -252,7 +337,6 @@ int test_cde_vitesse_rectangle(){
 
 int test_cde_vitesse_cercle(){
     int lettre, _step_ms = 1, temps_ms=0;
-    uint64_t t_apres, t_avant;
 
     printf("déplacement en cercle du robot : 100 mm/s\n");
     do{
@@ -287,6 +371,15 @@ int test_avance(void){
     Moteur_SetVitesse(MOTEUR_B, 0);
     Moteur_SetVitesse(MOTEUR_C, 0);
     return 0;
+}
+
+void affiche_localisation(){
+    struct position_t position;
+    while(1){
+        position = Localisation_get();
+        printf("X: %f, Y: %f, angle: %f\n", position.x_mm, position.y_mm, position.angle_radian *180. / 3.141592654);
+
+    }
 }
 
 void test_asser_moteur_printf(){

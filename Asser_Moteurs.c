@@ -27,7 +27,9 @@ void AsserMoteur_Init(){
     }
 }
 
-
+/// @brief Défini une consigne de vitesse pour le moteur indiqué.
+/// @param  moteur : Moteur à asservir
+/// @param _consigne_mm_s : consigne de vitesse en mm/s
 void AsserMoteur_setConsigne_mm_s(enum t_moteur moteur, double _consigne_mm_s){
     consigne_mm_s[moteur] = _consigne_mm_s;
 
@@ -50,6 +52,8 @@ double AsserMoteur_getVitesse_mm_s(enum t_moteur moteur, int step_ms){
     return distance / temps;
 }
 
+/// @brief Fonction d'asservissement des moteurs, à appeler périodiquement
+/// @param step_ms 
 void AsserMoteur_Gestion(int step_ms){
     // Pour chaque moteur
     for(uint moteur=MOTEUR_A; moteur<MOTEUR_C+1; moteur++ ){
