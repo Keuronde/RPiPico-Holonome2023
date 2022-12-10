@@ -6,16 +6,17 @@
 #include "math.h"
 
 #include "gyro.h"
-#include "Temps.h"
-#include "spi_nb.h"
-#include "Servomoteur.h"
+#include "Asser_Moteurs.h"
+#include "Asser_Position.h"
+#include "Commande_vitesse.h"
+#include "Localisation.h"
 #include "Moteurs.h"
 #include "QEI.h"
-#include "Asser_Moteurs.h"
-#include "Localisation.h"
-#include "Commande_vitesse.h"
-#include "Asser_Position.h"
-
+#include "Servomoteur.h"
+#include "spi_nb.h"
+#include "Temps.h"
+#include "Trajectoire.h"
+#include "Trajet.h"
 
 const uint LED_PIN = 25;
 const uint LED_PIN_ROUGE = 28;
@@ -38,6 +39,7 @@ int test_cde_vitesse_rectangle();
 int test_cde_vitesse_cercle();
 int test_asser_position_avance();
 int test_asser_position_avance_et_tourne();
+int test_trajectoire();
 void affiche_localisation();
 
 int main() {
@@ -148,6 +150,7 @@ int mode_test(){
     printf("I - Asser Position - avance et tourne\n");
     printf("M - pour les moteurs\n");
     printf("L - pour la localisation\n");
+    printf("T - Trajectoire\n");
     stdio_flush();
     int rep = getchar_timeout_us(TEST_TIMEOUT_US);
     stdio_flush();
@@ -204,9 +207,14 @@ int mode_test(){
         break;
     case 'L':
     case 'l':
-        /* code */
         while(test_localisation());
         break;
+
+    case 'T':
+    case 't':
+        while(test_trajectoire());
+        break;
+
     case PICO_ERROR_TIMEOUT:
         iteration--;        
         if(iteration == 0){
@@ -219,6 +227,64 @@ int mode_test(){
         break;
     }
     return 1;
+    
+}
+
+void test_trajectoire_printf(){
+    struct position_t _position;
+    while(1){
+        _position  = Trajet_get_consigne();
+        printf("T: %ld, X: %f, Y: %f, orientation: %2.1f\n", time_us_32()/1000, _position.x_mm, _position.y_mm, _position.angle_radian/M_PI*180);
+    }
+
+}
+
+int test_trajectoire(){
+    int lettre, _step_ms = 1, temps_ms=0;
+    Trajet_init();
+    struct trajectoire_t trajectoire;
+    printf("Choix trajectoire :\n");
+    printf("B - Bezier\n");
+    printf("C - Circulaire\n");
+    printf("D - Droite\n");
+    do{
+         lettre = getchar_timeout_us(TEST_TIMEOUT_US);
+         stdio_flush();
+    }while(lettre == PICO_ERROR_TIMEOUT);
+    switch(lettre){
+        case 'b':
+        case 'B':
+            Trajectoire_bezier(&trajectoire, 0, 0, -200., 450, 250, 450, 0, 0);
+            break;
+
+        case 'c':
+        case 'C':
+            Trajectoire_circulaire(&trajectoire, 0, 250, -90, 90, 250);
+            break;
+
+        case 'd':
+        case 'D':
+            Trajectoire_droite(&trajectoire, 0, 0, 0, 500);
+            break;
+        
+        default: return 0;
+    }
+
+    Trajet_debut_trajectoire(trajectoire);
+    multicore_launch_core1(test_trajectoire_printf);
+    do{
+        // Routines à 1 ms
+        QEI_update();
+        Localisation_gestion();
+        AsserMoteur_Gestion(_step_ms);
+
+        Trajet_avance(_step_ms/1000.);
+        sleep_ms(_step_ms);
+        temps_ms += _step_ms;
+        lettre = getchar_timeout_us(0);
+    }while(lettre == PICO_ERROR_TIMEOUT);
+
+    return 0;
     
 }
 

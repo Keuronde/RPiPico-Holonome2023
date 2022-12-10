@@ -20,6 +20,11 @@ gyro_ADXRS453.c
 Localisation.c
 Moteurs.c
 Temps.c
+Trajet.c
+Trajectoire.c
+Trajectoire_bezier.c
+Trajectoire_circulaire.c
+Trajectoire_droite.c
 Servomoteur.c
 spi_nb.c)
 

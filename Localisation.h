@@ -1,7 +1,4 @@
-struct position_t{
-    double x_mm, y_mm;
-    double angle_radian;
-};
+#include "Geometrie.h"
 
 struct position_t Localisation_get(void);
 void Localisation_gestion();
