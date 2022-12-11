@@ -137,7 +137,7 @@ int main() {
 
 // Mode test : renvoie 0 pour quitter le mode test
 int mode_test(){
-    static int iteration = 3;
+    static int iteration = 2;
     printf("Appuyez sur une touche pour entrer en mode test :\n");
     printf("A - pour asser_moteurs (rotation)\n");
     printf("B - pour avance (asser_moteur)\n");

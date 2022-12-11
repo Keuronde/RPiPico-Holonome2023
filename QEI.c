@@ -48,12 +48,12 @@ void QEI_init(){
     gpio_set_dir(CODEUR_1_B, GPIO_IN);
 
     // Initialisation des "machines à états" :
-    // QEI1 : broche 31 et 32 - pio : pio0, sm : 0, Offset : 0, broches (GPIO) 26 et 27, clock div : 0 pour commencer
-    // QEI1 : !!! Attention, il faudra modifier la carte élec !!!
+    // QEI1 : broche 31 et 32 - pio : pio0, sm : 0, Offset : 0, GPIO 26 et 27, clock div : 0 pour commencer
+    // QEI1 : !!! Attention, il faudra modifier la carte élec !!! => Fait.
     quadrature_encoder_program_init(pio_QEI, 0, offset, 26, 0);
-    // QEI2 : broche 26 et 27 - pio : pio0, sm : 1, Offset : 0, broches (GPIO) 20 et 21, clock div : 0 pour commencer
+    // QEI2 : broche 26 et 27 - pio : pio0, sm : 1, Offset : 0, GPIO 20 et 21, clock div : 0 pour commencer
     quadrature_encoder_program_init(pio_QEI, 1, offset, 20, 0);
-    // QEI3 : broche 24 et 25 - pio : pio0, sm : 1, Offset : 0, broches (GPIO) 18 et 19, clock div : 0 pour commencer
+    // QEI3 : broche 24 et 25 - pio : pio0, sm : 1, Offset : 0, GPIO 18 et 19, clock div : 0 pour commencer
     quadrature_encoder_program_init(pio_QEI, 2, offset, 18, 0);
 
     QEI_A.value=0;

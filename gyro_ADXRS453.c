@@ -162,7 +162,7 @@ void gyro_get_vitesse_brute(struct t_angle_gyro* angle_gyro, struct t_angle_gyro
         return;
     }
     
-    rot_z = Gyro_SensorData.rateData;
+    rot_z = -Gyro_SensorData.rateData;
 
     if(angle_gyro_moy == NULL){
         angle_gyro->rot_x = 0;
@@ -241,107 +241,4 @@ void Gyro_traitementDonnees(uint8_t * tamponRecu){
     Gyro_SensorData.P1  = (tamponRecu[3] & 0x01);
 
 }
-/*
-unsigned char Gyro_gestion(void){
-    Gyro_commande_SensorData(0);
-    while(!SPI_recData(GyroscopeReception));
-    
-    Gyro_traitementDonnees(GyroscopeReception);
-    if (Gyro_SensorData.SQ & 0x04){
-        Gyro_Angle +=(long) (Gyro_SensorData.rateData - angle0);
-        //Gyro_Angle = angle0;
-    }else{
-        Gyro_Angle = (long)0x3333;
-    }
-    return 0;
-}
-inline unsigned char Gyro_gestion_nb(){
-    if(SPI_recData(GyroscopeReception)){
-        Gyro_traitementDonnees(GyroscopeReception);
-        if (Gyro_SensorData.SQ & 0x04)
-            // calcul du nouvel angle
-            // TODO : Améliorer la stabilitée en augmentant la précision
-            Gyro_Angle +=(long) ((long)Gyro_SensorData.rateData - (long)angle0);
-        return 0;
-    }
-    return 1;
-
-}
-
-int Gyro_getAngle(void){
-    // 80° par secondes
-    // 5 kHz => 200 µs
-    // Gyro_Angle en 1,6 e-2 degré
-    return (int)(-Gyro_Angle / 5000 / 80);
-}
-long Gyro_getRawAngle(void){
-    // 80° par secondes
-    // 5 kHz => 200 µs
-    // Gyro_Angle en 1,6 e-2 degré
-    return Gyro_Angle ;
-}
-long double Gyro_getAngleRadian(void){
-    // 80° par secondes
-    // 5 kHz => 200 µs
-    // Gyro_Angle en 1,6 e-2 degré
-    return -Gyro_Angle * GYRO_COEF_RADIAN_5kHz;
-}
-unsigned char * Gyro_getRawData(){
-    return GyroscopeReception;
-}
-
-int Gyro_init(){
-    
-    long long calcul_angle0;
-    
-    int i, erreur_gyro;
-    
-    Gyro_Timer_ms=100;
-    while(Gyro_Timer_ms);
-    // Envoie message auto-test des test
-    while(!Gyro_commande_SensorData(1));
-    while(!SPI_recData(GyroscopeReception));
-    
-    // Attente 50 ms - les tests doivent indiquer des erreur
-    Gyro_Timer_ms=50;
-    while(Gyro_Timer_ms);
-    while(!Gyro_commande_SensorData(0));
-    while(!SPI_recData(GyroscopeReception));
-
-    // Attente 50 ms - les erreurs doivent s'être effacées
-    Gyro_Timer_ms=50;
-    while(Gyro_Timer_ms);
-    while(!Gyro_commande_SensorData(0));
-    while(!SPI_recData(GyroscopeReception));
-
-    // Calibration du gyroscope
-    calcul_angle0 = 0;
-    i=0;
-    erreur_gyro = 0;
-    while((i<NB_ACQ_CALIBRATION) && (erreur_gyro < NB_MAX_ERREUR_GYRO)){
-        while(!Gyro_commande_SensorData(0));
-        while(!SPI_recData(GyroscopeReception));
-        Gyro_traitementDonnees(GyroscopeReception);
-        if (Gyro_SensorData.SQ & 0x04){
-            calcul_angle0 += Gyro_SensorData.rateData;
-            erreur_gyro = 0;
-            i++;
-        }else{
-            erreur_gyro++;
-        }
-        __delay32(2000); // 50 µs
-    }
-    if (erreur_gyro < NB_MAX_ERREUR_GYRO){
-        erreur_gyro = 0;
-        // TODO : Améliorer la stabilitée en augmentant la précision
-        angle0 = (long)(calcul_angle0 / NB_ACQ_CALIBRATION);
-        Gyro_Pret=1;
-    }else{
-        erreur_gyro = 1;
-    }
-    
-
-    return erreur_gyro;
-}
-*/
 #endif

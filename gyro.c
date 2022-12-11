@@ -57,8 +57,9 @@ void Gyro_Init(void){
     vitesse_calibration = NULL;
     vitesse_angulaire = &_vitesse_angulaire;
 
-    //spi_init(spi0, 100 * 1000); // SPI init @ 100 kHz
+    //uint speed = spi_init(spi0, 10 * 1000); // SPI init @ 10 kHz
     uint speed = spi_init(spi0, 2 * 1000 * 1000); // SPI init @ 2 MHz
+    
     printf("vitesse SPI : %d\n", speed);
 
 
