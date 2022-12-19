@@ -1,6 +1,7 @@
 #include <math.h>
 #include "Geometrie.h"
 #include "Trajectoire.h"
+#include "Trajet.h"
 #include "Asser_Position.h"
 
 #define VITESSE_MAX_MM_S 1000
@@ -29,7 +30,7 @@ void Trajet_debut_trajectoire(struct trajectoire_t trajectoire){
     trajet_trajectoire = trajectoire;
 }
 
-void Trajet_avance(double pas_de_temps_s){
+int Trajet_avance(double pas_de_temps_s){
     double distance_mm, orientation_radian;
     struct point_xy_t point;
     struct position_t position;
@@ -57,13 +58,18 @@ void Trajet_avance(double pas_de_temps_s){
     position_consigne=position;
     Asser_Position(position);
 
+    if(abscisse >= 1 ){
+        return TRAJET_TERMINE;
+    }
+    return TRAJET_EN_COURS;
+
 }
 
 struct position_t Trajet_get_consigne(){
     return position_consigne;
 }
 
-/// @brief Calcule la vitesse à partir de l'accelération du robot, de la vitesse maximale et de la contrainte en fin de trajectoire
+/// @brief Calcule la vitesse à partir de l’accélération du robot, de la vitesse maximale et de la contrainte en fin de trajectoire
 /// @param pas_de_temps_s : temps écoulé en ms
 /// @return vitesse déterminée en m/s
 double Trajet_calcul_vitesse(double pas_de_temps_s){
