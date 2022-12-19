@@ -1,7 +1,9 @@
+#include "gyro.h"
 #include "Localisation.h"
 #include "QEI.h"
 #include "math.h"
 #include "Geometrie_robot.h"
+#include "Robot_config.h"
 
 struct position_t position;
 
@@ -12,6 +14,7 @@ void Localisation_init(){
 }
 
 void Localisation_gestion(){
+    struct t_angle_gyro_double angle_gyro;
     // Voir http://poivron-robotique.fr/Robot-holonome-localisation-partie-2.html
     double distance_roue_a_mm = QEI_get_mm(QEI_A_NAME);
     double distance_roue_b_mm = QEI_get_mm(QEI_B_NAME);
@@ -21,7 +24,12 @@ void Localisation_gestion(){
     delta_x_ref_robot = (distance_roue_a_mm + distance_roue_b_mm - 2 * distance_roue_c_mm)  / 3.0;
     delta_y_ref_robot = (-distance_roue_a_mm + distance_roue_b_mm)  * RACINE_DE_3 / 3.0;
 
-    position.angle_radian += - ( distance_roue_a_mm + distance_roue_b_mm + distance_roue_c_mm) / (3 * DISTANCE_ROUES_CENTRE_MM);
+    if(get_position_avec_gyroscope()){
+        angle_gyro = gyro_get_angle_degres();
+        position.angle_radian = angle_gyro.rot_z / 180. * M_PI ;
+    }else{
+        position.angle_radian += - ( distance_roue_a_mm + distance_roue_b_mm + distance_roue_c_mm) / (3 * DISTANCE_ROUES_CENTRE_MM);
+    }
 
     // Projection dans le référentiel du robot
     position.x_mm += delta_x_ref_robot * cos(position.angle_radian) - delta_y_ref_robot * sin(position.angle_radian);

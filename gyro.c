@@ -36,7 +36,7 @@ uint32_t rot_x_zero, rot_y_zero, rot_z_zero;
 struct t_angle_gyro_double angle_gyro, vitesse_gyro;
 
 
-struct t_angle_gyro_double gyro_get_angle(void){
+struct t_angle_gyro_double gyro_get_angle_degres(void){
     return angle_gyro;
 }
 struct t_angle_gyro_double gyro_get_vitesse(void){

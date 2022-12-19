@@ -3,7 +3,7 @@
 #include "math.h"
 
 #define GAIN_P_POSITION 100
-#define GAIN_P_ORIENTATION 100
+#define GAIN_P_ORIENTATION 20
 
 /// @brief Asservissement de la position du robot. Les gains sont déterminés pour des positions très proches du robot
 /// C'est à la consigne d'être défini avant pour être atteignable.

@@ -2,6 +2,7 @@
 #include "Geometrie_robot.h"
 
 /// @brief Commande de la vitesse dans le référentiel du robot
+/// Tel que décrit ici : http://poivron-robotique.fr/Robot-holonome-lois-de-commande.html
 /// @param vitesse_x_mm_s : Vitesse x en mm/s dans le référentiel du robot
 /// @param vitesse_y_mm_s : Vitesse y en mm/s dans le référentiel du robot
 /// @param orientation_radian_s : Rotation en radian/s dans le référentiel du robot

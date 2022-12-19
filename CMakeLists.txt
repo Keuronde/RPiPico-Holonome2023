@@ -8,7 +8,7 @@ pico_sdk_init()
 
 
 add_executable(test
-test.c
+Holonome2023.c
 APDS_9960.c
 Asser_Moteurs.c
 Asser_Position.c
@@ -19,7 +19,9 @@ gyro_L3GD20H.c
 gyro_ADXRS453.c
 Localisation.c
 Moteurs.c
+Robot_config.c
 Temps.c
+Test.c
 Trajet.c
 Trajectoire.c
 Trajectoire_bezier.c
@@ -34,7 +36,7 @@ add_definitions(-DGYRO_ADXRS453)
 pico_enable_stdio_usb(test 1)
 pico_enable_stdio_uart(test 1)
 pico_add_extra_outputs(test)
-target_link_libraries(test pico_stdlib hardware_spi hardware_pwm hardware_structs hardware_pio pico_multicore)
+target_link_libraries(test pico_stdlib hardware_timer hardware_spi hardware_pwm hardware_structs hardware_pio pico_multicore)
 
 add_custom_target(Flash
     DEPENDS test

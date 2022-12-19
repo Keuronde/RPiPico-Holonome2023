@@ -179,7 +179,7 @@ void gyro_get_vitesse_normalisee(struct t_angle_gyro* _vitesse_angulaire,
         struct t_angle_gyro_double * _vitesse_gyro){
     _vitesse_gyro->rot_x = (double)_vitesse_angulaire->rot_x * 0.0125 / 32.0;
     _vitesse_gyro->rot_y = (double)_vitesse_angulaire->rot_y * 0.0125 / 32.0;
-    _vitesse_gyro->rot_z = (double)_vitesse_angulaire->rot_z * 0.0125 / 32.0;
+    _vitesse_gyro->rot_z = (double)_vitesse_angulaire->rot_z * 0.0125 / 32.0 * 360. / 357.; // Gain mesuré
 }
 
 
