@@ -1,8 +1,8 @@
 Code de déplacement du robot holonome 2023
 ==========================================
-Ce dépôt contient de code de déplacement du robot holonome de l'équipe [Poivron Robotique](http://poivron-robotique.fr). Ce robot a pour ambition de participer à la coupe de France de Robotique en 2023.
+Ce dépôt contient de code le déplacement du robot holonome de l'équipe [Poivron Robotique](http://poivron-robotique.fr). Ce robot a pour ambition de participer à la coupe de France de Robotique en 2023.
 
-Le but est de présenter un code assurant toutes les fonctions de déplacement du robot, allant de la commande PWM des moteurs jusqu'au suivi d'une trajectoire (droite, portion de cercle, courbe de Bézier) en passant par le contrôle de l'accélération et de décélération.
+Le but est de présenter un code assurant toutes les fonctions de déplacement du robot, allant de la commande PWM des moteurs jusqu'au suivi d'une trajectoire (droite, portion de cercle, courbe de Bézier) en passant par le contrôle de l'accélération et de la décélération.
 
 Ce code est conçu pour s'exécuter sur un Raspberry Pi Pico.
 
@@ -16,7 +16,7 @@ Initialise les modules PWM et propose les fonctions pour les piloter.
 
 QEI
 ---
-Décode les signaux renvoyés par les codeurs et les convertit en distance parcoure par les roues en millimètres.
+Décode les signaux renvoyés par les codeurs et les convertit en distance parcoure par les roues, en millimètres.
 
 L'interprétation des signaux se fait grâce aux PIOs et à l'[exemple fourni dans le SDK](https://github.com/raspberrypi/pico-examples/tree/master/pio/quadrature_encoder).
 
@@ -35,7 +35,7 @@ Compensation du biais du gyroscope et intégration de la vitesse pour obtenir l'
 Localisation
 ------------
 
-Utilisation des équations définies dans [l'étude](http://poivron-robotique.fr/Robot-holonome-localisation-partie-2.html) pour obtenir la position du robot à partir du déplacement mesuré de ses roues.
+Utilisation des équations définies dans [cette l'étude](http://poivron-robotique.fr/Robot-holonome-localisation-partie-2.html) pour obtenir la position du robot à partir du déplacement mesuré de ses roues.
 
 Devrait à terme aussi utiliser les valeurs du gyroscope pour gagner en précision.
 
