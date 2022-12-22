@@ -17,6 +17,7 @@ QEI.c
 gyro.c
 gyro_L3GD20H.c
 gyro_ADXRS453.c
+i2c_maitre.c
 Localisation.c
 Moteurs.c
 Robot_config.c
@@ -36,9 +37,9 @@ add_definitions(-DGYRO_ADXRS453)
 pico_enable_stdio_usb(test 1)
 pico_enable_stdio_uart(test 1)
 pico_add_extra_outputs(test)
-target_link_libraries(test pico_stdlib hardware_timer hardware_spi hardware_pwm hardware_structs hardware_pio pico_multicore)
+target_link_libraries(test pico_stdlib hardware_i2c hardware_timer hardware_spi hardware_pwm hardware_structs hardware_pio pico_multicore)
 
 add_custom_target(Flash
     DEPENDS test
-    COMMAND sudo picotool load ${PROJECT_BINARY_DIR}/test.uf2
+    COMMAND sudo picotool load -f ${PROJECT_BINARY_DIR}/test.uf2
 )
