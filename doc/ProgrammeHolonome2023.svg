@@ -40,8 +40,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.54838704"
-     inkscape:cx="2689.2562"
-     inkscape:cy="1223.561"
+     inkscape:cx="3048.8334"
+     inkscape:cy="1048.0463"
      inkscape:window-width="1920"
      inkscape:window-height="1016"
      inkscape:window-x="0"
@@ -471,7 +471,7 @@
          style="stroke-width:0.264583"
          x="568.95526"
          y="92.690437"
-         id="tspan2225">PMW</tspan></text>
+         id="tspan2225">PWM</tspan></text>
     <g
        id="g5392"
        transform="translate(367.97643,0.17760668)">
@@ -803,7 +803,7 @@
          x="504.31293"
          y="97.716385"
          style="fill:#008000;stroke-width:0.638136px"
-         id="tspan2095">Consigne PMW</tspan></text>
+         id="tspan2095">Consigne PWM</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker2129)"
        d="m 625.82361,88.308674 h 51.62124"
