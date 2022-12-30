@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "pico/multicore.h"
 #include "pico/stdlib.h"
+#include "pico/stdio.h"
 #include "hardware/gpio.h"
 #include "hardware/i2c.h"
 #include "pico/binary_info.h"
@@ -40,8 +41,9 @@ int test_cde_vitesse_cercle(void);
 int test_asser_position_avance(void);
 int test_asser_position_avance_et_tourne(int);
 int test_trajectoire(void);
-int test_tca9535(void);
+int test_i2c_bus(void);
 void affiche_localisation(void);
+int test_i2c_lecture_pico_annex();
 
 
 // Mode test : renvoie 0 pour quitter le mode test
@@ -63,6 +65,7 @@ int mode_test(){
     printf("T - Trajectoire\n");
     printf("U - Scan du bus i2c\n");
     printf("V - APDS_9960\n");
+    printf("W - Com i2c Pico Annexe\n");
     stdio_flush();
     int rep = getchar_timeout_us(TEST_TIMEOUT_US);
     stdio_flush();
@@ -133,7 +136,7 @@ int mode_test(){
 
     case 'U':
     case 'u':
-        while(test_tca9535());
+        while(test_i2c_bus());
         break;
 
     case 'V':
@@ -141,11 +144,16 @@ int mode_test(){
         while(test_APDS9960());
         break;
 
+    case 'W':
+    case 'w':
+        while(test_i2c_lecture_pico_annex());
+        break;
+
     case PICO_ERROR_TIMEOUT:
         iteration--;        
         if(iteration == 0){
-            printf("Sortie du mode test\n");
-            return 0;
+            //printf("Sortie du mode test\n");
+            //return 0;
         }
 
     default:
@@ -179,7 +187,37 @@ int test_APDS9960(){
     return 1;
 }
 
-int test_tca9535(){
+int test_i2c_lecture_pico_annex(){
+    i2c_maitre_init();
+    uint8_t tampon[10];
+    uint8_t registre=0;
+    uint8_t adresse = 0x17;
+    int ret; 
+    
+    ret = i2c_write_blocking(i2c0, adresse,&registre, 1, false);
+    if(ret < 0){
+        printf("Erreur I2C : %d", ret);
+        return 0;
+    }
+
+    ret = i2c_read_blocking(i2c_default, adresse, tampon, 10, false);
+    if(ret < 0){
+        printf("Erreur I2C : %d", ret);
+    }else{
+        for(int i=0; i<10; i++){
+            printf("%c", tampon[i]);
+        }
+        printf("\n");
+
+        for(int i=0; i<10; i++){
+            printf("%2x ", tampon[i]);
+        }
+        printf("\n");
+    }
+    return 0;
+}
+
+int test_i2c_bus(){
     // Adresse I2C : 0b0100 000 R/W
     // Lecture des broches sur les registres 0 et 1
     // Registre 2 et 3 : valeur des broches en sorties
@@ -189,7 +227,7 @@ int test_tca9535(){
     uint8_t reception[8];
     uint8_t emission[8];
     //uint8_t adresse = 0b0100000;
-    uint8_t adresse = 0x39;
+    uint8_t adresse = 0x20;
     int statu;
     int lettre;
 
@@ -198,17 +236,18 @@ int test_tca9535(){
     i2c_maitre_init();
     // Scan bus I2C - cf SDK
     printf("\nI2C Bus Scan\n");
-    printf("   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F\n");
+    printf("   0 1 2 3 4 5 6 7 8 9 A B C D E F\n");
     for (int addr = 0; addr < (1 << 7); ++addr) {
         if (addr % 16 == 0) {
             printf("%02x ", addr);
         }
         int ret;
-        uint8_t rxdata;
+        uint8_t rxdata=0x55;
         if (reserved_addr(addr))
             ret = PICO_ERROR_GENERIC;
         else
             ret = i2c_read_blocking(i2c_default, addr, &rxdata, 1, false);
+            //ret = i2c_write_blocking(i2c_default, addr, &rxdata, 1, false);
         
         printf(ret < 0 ? "." : "@");
         printf(addr % 16 == 15 ? "\n" : " ");

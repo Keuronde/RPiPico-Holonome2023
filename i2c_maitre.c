@@ -11,12 +11,17 @@ void i2c_maitre_init(void){
     stdio_init_all();
     i2c_init(i2c0, 100 * 1000);
 
+    printf("Initialisation des broches\n");
+    for(int i=0; i++; i<=28){
+        if(gpio_get_function(i) == GPIO_FUNC_I2C){
+            printf("Borche I2C : %d\n", i);
+            gpio_set_function(i, GPIO_FUNC_NULL);
+        }
+    }
+
+    printf("%d et %d en I2C\n", I2C_SDA_PIN, I2C_SCL_PIN);
     gpio_set_function(I2C_SDA_PIN, GPIO_FUNC_I2C);
     gpio_set_function(I2C_SCL_PIN, GPIO_FUNC_I2C);
-
-    gpio_set_function(6, GPIO_FUNC_NULL);
-    gpio_set_function(7, GPIO_FUNC_NULL);
-
 }
 
 /// @brief Pour l'instant bloquant, mais devrait passer en non bloquant bientôt
