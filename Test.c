@@ -44,6 +44,7 @@ int test_trajectoire(void);
 int test_i2c_bus(void);
 void affiche_localisation(void);
 int test_i2c_lecture_pico_annex();
+int test_i2c_lecture_pico_annex_nb();
 
 
 // Mode test : renvoie 0 pour quitter le mode test
@@ -66,6 +67,7 @@ int mode_test(){
     printf("U - Scan du bus i2c\n");
     printf("V - APDS_9960\n");
     printf("W - Com i2c Pico Annexe\n");
+    printf("X - Com i2c Pico Annexe - non bloquant\n");
     stdio_flush();
     int rep = getchar_timeout_us(TEST_TIMEOUT_US);
     stdio_flush();
@@ -149,6 +151,11 @@ int mode_test(){
         while(test_i2c_lecture_pico_annex());
         break;
 
+    case 'X':
+    case 'x':
+        while(test_i2c_lecture_pico_annex_nb());
+        break;
+
     case PICO_ERROR_TIMEOUT:
         iteration--;        
         if(iteration == 0){
@@ -162,6 +169,22 @@ int mode_test(){
     }
     return 1;
     
+}
+
+int test_continue_test(){
+    int lettre;
+    printf("q pour quitter, une autre touche pour un nouveau test.\n");
+    do{
+        lettre = getchar_timeout_us(0);
+    }while(lettre == PICO_ERROR_TIMEOUT || lettre == 0);
+    switch(lettre){
+        case 'q':
+        case 'Q':
+            return 0;
+        default:
+            return 1;
+    }
+
 }
 
 bool reserved_addr(uint8_t addr) {
@@ -214,7 +237,89 @@ int test_i2c_lecture_pico_annex(){
         }
         printf("\n");
     }
-    return 0;
+    return test_continue_test();
+}
+
+int test_i2c_lecture_pico_annex_nb(){
+    i2c_maitre_init();
+    uint8_t tampon[10];
+    uint8_t registre=0;
+    uint8_t adresse = 0x17;
+    uint32_t time_i2c[5];
+    const uint8_t T_MAX_I2C = 10;
+    int ret; 
+
+    time_i2c[0] = time_us_32();
+
+    // On charge l'adresse de l'escalve
+    i2c0->hw->enable = 0;
+    i2c0->hw->tar = adresse;
+    i2c0->hw->enable = 1;
+
+    // On envoie l'adresse du registre à lire
+    // Pas de stop, pas de restart, écriture : 0, 
+
+    i2c0->hw->data_cmd = registre;
+
+    uint8_t first = false;
+    uint8_t last = false;
+
+    for(int i=0; i<T_MAX_I2C; i++){
+        first = false;
+        last = false;
+        if (i == 0){
+            first = true;
+        }
+        if(i == T_MAX_I2C -1){
+            last = true;
+        }
+
+        i2c0->hw->data_cmd =
+                bool_to_bit(first) << I2C_IC_DATA_CMD_RESTART_LSB |
+                bool_to_bit(last) << I2C_IC_DATA_CMD_STOP_LSB |
+                I2C_IC_DATA_CMD_CMD_BITS; // -> 1 for read
+    }
+
+    time_i2c[1] = time_us_32() - time_i2c[0] ;
+
+    // On attend la fin de la transaction i2c
+    while(i2c0->hw->status & I2C_IC_STATUS_MST_ACTIVITY_BITS);
+
+    time_i2c[2] = time_us_32() - time_i2c[0] ;
+
+    // On lit le tampon I2C
+    // uint8_t * dst;
+    // dst = tampon;
+    
+    for(int i=0; i<T_MAX_I2C; i++){
+        // On attend une donnée
+        while(!i2c_get_read_available(i2c0));
+
+        // Code erreur
+        if(i2c0->hw->tx_abrt_source){
+            printf("Erreur I2C: Abort : %4x\n", i2c0->hw->tx_abrt_source);
+        }
+
+        //On lit la donnée
+        tampon[i] = (uint8_t) i2c0->hw->data_cmd;
+    }
+
+    time_i2c[3] = time_us_32() - time_i2c[0] ;
+
+    // Affichage
+    for(int i=0; i<T_MAX_I2C; i++){
+        printf("%c", tampon[i]);
+    }
+    printf("\n");
+
+    for(int i=0; i<T_MAX_I2C; i++){
+        printf("%2x ", tampon[i]);
+    }
+    printf("\n");
+
+    printf("T_init: %u, T_attente: %u, T_lecture: %u\n", time_i2c[1], time_i2c[2], time_i2c[3]);
+
+    return test_continue_test();
 }
 
 int test_i2c_bus(){
