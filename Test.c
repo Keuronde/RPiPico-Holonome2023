@@ -45,6 +45,7 @@ int test_i2c_bus(void);
 void affiche_localisation(void);
 int test_i2c_lecture_pico_annex();
 int test_i2c_lecture_pico_annex_nb();
+int test_i2c_lecture_pico_annex_nb2();
 
 
 // Mode test : renvoie 0 pour quitter le mode test
@@ -153,7 +154,7 @@ int mode_test(){
 
     case 'X':
     case 'x':
-        while(test_i2c_lecture_pico_annex_nb());
+        while(test_i2c_lecture_pico_annex_nb2());
         break;
 
     case PICO_ERROR_TIMEOUT:
@@ -318,6 +319,44 @@ int test_i2c_lecture_pico_annex_nb(){
     printf("\n");
 
     printf("T_init: %u, T_attente: %u, T_lecture: %u\n", time_i2c[1], time_i2c[2], time_i2c[3]);
+
+    return test_continue_test();
+}
+
+int test_i2c_lecture_pico_annex_nb2(){
+    i2c_maitre_init();
+
+    uint8_t tampon[10];
+    uint8_t registre=0;
+    uint8_t adresse = 0x17;
+    uint32_t time_i2c[5];
+    const uint8_t T_MAX_I2C = 10;
+    enum i2c_resultat_t retour_i2c = I2C_EN_COURS;
+
+    time_i2c[0] = time_us_32();
+    time_i2c[2] = 0;
+
+    while(retour_i2c == I2C_EN_COURS){
+        time_i2c[1] = time_us_32(); // Pour mesurer le temps d'execution
+        i2c_gestion(i2c0);
+        retour_i2c = i2c_lire_registre_nb(adresse, registre, tampon, T_MAX_I2C);
+        time_i2c[2] += time_us_32() - time_i2c[1]; // Pour mesurer le temps d'execution
+        sleep_us(100); // Attente, ou le reste du code
+    }
+    time_i2c[3] = time_us_32() - time_i2c[0];
+
+    // Affichage
+    for(int i=0; i<T_MAX_I2C; i++){
+        printf("%c", tampon[i]);
+    }
+    printf("\n");
+
+    for(int i=0; i<T_MAX_I2C; i++){
+        printf("%2x ", tampon[i]);
+    }
+    printf("\n");
+
+    printf("Temps lecture : %u microsecondes, temps specifique i2c : %u microsecondes.\n", time_i2c[3], time_i2c[2]);
 
     return test_continue_test();
 }

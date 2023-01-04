@@ -6,6 +6,8 @@ Le but est de présenter un code assurant toutes les fonctions de déplacement d
 
 Ce code est conçu pour s'exécuter sur un Raspberry Pi Pico.
 
+Nous en profitons pour proposer également les fonctions bas niveau développée pour le Raspberry Pi Pico.
+
 ![Architecture du programme](doc/ProgrammeHolonome2023.png)
 
 Voici un bref paragraphe explicatif pour chaque bloc fonctionnel.
@@ -64,3 +66,15 @@ Cette fonction permet de parcourir une trajectoire en tenant compte des contrain
 3. Obtention de la nouvelle consigne de position.
 
 Pour se déplacer sur une trajectoire, cette fonction utilise les outils de gestion des trajectoires définis dans les fichiers `trajectoire*`.
+
+Fonctions bas niveau
+===================
+
+I2C Maître, non bloquant
+------------------------
+
+Le fichier [i2c_maitre.c](i2c_maitre.c) propose une implémentation non-bloquante de l'i2c. L'utilisation s'effectue ainsi :
+- La fonction *i2c_gestion* doit être appelée régulièrement.
+- La fonction *i2c_transmission* (ou une fonction englobant celle-ci, telle que *i2c_lire_registre_nb*) doit être appelée jusqu'à ce qu'elle renvoie I2C_SUCCES. 
+
+Pour un exemple concret lisant une valeur dans une mémoire i2c, voir *test_i2c_lecture_pico_annex_nb2* de [test.c](test.c)
