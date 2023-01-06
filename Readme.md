@@ -6,7 +6,7 @@ Le but est de présenter un code assurant toutes les fonctions de déplacement d
 
 Ce code est conçu pour s'exécuter sur un Raspberry Pi Pico.
 
-Nous en profitons pour proposer également les fonctions bas niveau développée pour le Raspberry Pi Pico.
+Nous en profitons pour proposer également les fonctions bas niveau développées pour le Raspberry Pi Pico.
 
 ![Architecture du programme](doc/ProgrammeHolonome2023.png)
 
@@ -28,7 +28,7 @@ Tentative de créer des fonctions non bloquantes pour le SPI. Mais vu la vitesse
 
 Gyro ADXRS453
 ----
-Initialise le Gyroscope ADXRS453. Décode les données fournies par le gyroscope et les converti en radian/seconde. Les biais éventuels ne sont pas compensés.
+Initialise le Gyroscope ADXRS453. Décode les données fournies par le gyroscope et les convertit en radian/seconde. Les biais éventuels ne sont pas compensés.
 
 Gyro
 ----
@@ -77,4 +77,4 @@ Le fichier [i2c_maitre.c](i2c_maitre.c) propose une implémentation non-bloquant
 - La fonction *i2c_gestion* doit être appelée régulièrement.
 - La fonction *i2c_transmission* (ou une fonction englobant celle-ci, telle que *i2c_lire_registre_nb*) doit être appelée jusqu'à ce qu'elle renvoie I2C_SUCCES. 
 
-Pour un exemple concret lisant une valeur dans une mémoire i2c, voir *test_i2c_lecture_pico_annex_nb2* de [test.c](test.c)
+Pour un exemple concret lisant une valeur dans une mémoire i2c, voir *test_i2c_lecture_pico_annex_nb2* de [Test.c](Test.c)
